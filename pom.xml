@@ -40,6 +40,7 @@
   <modules>
     <module>udp-ra</module>
     <module>udp-rar</module>
+    <module>udp-sample</module>
   </modules>
 
   <dependencyManagement>
@@ -171,6 +172,16 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-rar-plugin</artifactId>
+          <version>2.3</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-ear-plugin</artifactId>
+          <version>2.8</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-ejb-plugin</artifactId>
           <version>2.3</version>
         </plugin>
         <plugin>
