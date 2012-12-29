@@ -5,8 +5,8 @@
   <artifactId>udp-adapter</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>UDP Adapter</name>
-  <description>A UDP JCA resource adapter.</description>
+  <name>UDP JMS Adapter</name>
+  <description>A UDP JMS resource adapter.</description>
   <inceptionYear>2012</inceptionYear>
 
   <url>https://github.com/marschall/udp-adapter</url>

@@ -19,6 +19,10 @@ public class DatagramIncommingMessage implements Message {
     this.replyTo = new ReplyTo();
     this.destination = new Self();
   }
+  
+  DatagramPacket getPacket() {
+    return this.packet;
+  }
 
   @Override
   public String getJMSMessageID() throws JMSException {

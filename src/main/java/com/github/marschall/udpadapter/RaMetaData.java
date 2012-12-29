@@ -11,26 +11,22 @@ public class RaMetaData implements ResourceAdapterMetaData {
 
   @Override
   public String getAdapterVendorName() {
-    // TODO Auto-generated method stub
-    return "";
+    return "Philippe Marschall";
   }
 
   @Override
   public String getAdapterName() {
-    // TODO Auto-generated method stub
-    return null;
+    return "UDP JMS Adapter";
   }
 
   @Override
   public String getAdapterShortDescription() {
-    // TODO Auto-generated method stub
-    return null;
+    return "A UDP JMS resource adapter.";
   }
 
   @Override
   public String getSpecVersion() {
-    // TODO Auto-generated method stub
-    return null;
+    return "1.6";
   }
 
   @Override

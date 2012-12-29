@@ -1,7 +1,9 @@
 package com.github.marschall.udpadapter;
 
+import java.net.SocketException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Logger;
 
 import javax.resource.NotSupportedException;
 import javax.resource.ResourceException;
@@ -16,6 +18,8 @@ import javax.transaction.xa.XAResource;
 
 @Connector
 public class UdpAdapter implements ResourceAdapter {
+  
+  static final Logger LOG = Logger.getLogger(UdpAdapter.class.getName());
 
   private volatile WorkManager workManager;
   
@@ -28,11 +32,13 @@ public class UdpAdapter implements ResourceAdapter {
   @Override
   public void start(BootstrapContext ctx) throws ResourceAdapterInternalException {
     workManager = ctx.getWorkManager();
+    LOG.fine("started");
   }
 
   @Override
   public void stop() {
     workManager = null;
+    LOG.fine("stopped");
   }
 
   @Override
@@ -45,9 +51,22 @@ public class UdpAdapter implements ResourceAdapter {
     if (!(spec instanceof UdpActivationSpec)) {
       throw new NotSupportedException("That type of ActivationSpec not supported: " + spec.getClass());
     }
-    Listener listener = new Listener(endpointFactory);
+    Listener listener;
+    try {
+      listener = new Listener(this.workManager, endpointFactory, (UdpActivationSpec) spec);
+    } catch (SocketException e) {
+      throw new ResourceException("could not create socket", e);
+    }
+    
+    try {
+      listener.configureSocket();
+    } catch (SocketException e) {
+      throw new ResourceException("could not configure socket", e);
+    }
+    
     this.workManager.scheduleWork(listener);
     this.activations.put(spec, listener);
+    LOG.fine("endpointActivation");
   }
 
   @Override
@@ -56,7 +75,7 @@ public class UdpAdapter implements ResourceAdapter {
     if (listener != null) {
       listener.release();
     }
-
+    LOG.fine("endpointDeactivation");
   }
 
   @Override
