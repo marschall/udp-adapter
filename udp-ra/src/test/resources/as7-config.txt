@@ -1,0 +1,2 @@
+https://community.jboss.org/thread/198546
+http://www.mastertheboss.com/ejb-3/developing-mdb-with-jboss-as-7
