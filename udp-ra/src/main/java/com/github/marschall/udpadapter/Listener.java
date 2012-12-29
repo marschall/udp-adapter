@@ -58,7 +58,7 @@ final class Listener implements Work {
   @Override
   public void run() {
     if (!this.cancel) {
-      DatagramIncommingMessage message = this.pool.getMessage();
+      DatagramMessage message = this.pool.getMessage();
       boolean dispatch = false;
       while (!dispatch) {
         try {
@@ -88,7 +88,7 @@ final class Listener implements Work {
     }
   }
   
-  private void dispatch(DatagramIncommingMessage message) {
+  private void dispatch(DatagramMessage message) {
     // dispatch in same thread to avoid context switch
     MessageEndpoint endpoint;
     try {

@@ -8,7 +8,7 @@ final class MessagePool {
   
   private UdpActivationSpec spec;
   
-  private final Queue<DatagramIncommingMessage> pool;
+  private final Queue<DatagramMessage> pool;
 
   MessagePool(UdpActivationSpec spec) {
     this.spec = spec;
@@ -17,16 +17,16 @@ final class MessagePool {
   }
 
   
-  DatagramIncommingMessage getMessage() {
+  DatagramMessage getMessage() {
     // non-blocking version
-    DatagramIncommingMessage message = this.pool.poll();
+    DatagramMessage message = this.pool.poll();
     if (message == null) {
       message = this.newMessage();
     }
     return message;
   }
   
-  void returnMessage(DatagramIncommingMessage message) {
+  void returnMessage(DatagramMessage message) {
     // non-blocking version
     this.pool.offer(message);
   }
@@ -35,10 +35,10 @@ final class MessagePool {
     this.pool.clear();
   }
 
-  private DatagramIncommingMessage newMessage() {
+  private DatagramMessage newMessage() {
     byte[] data = new byte[this.spec.getDataLength()];
     DatagramPacket datagramPacket = new DatagramPacket(data, data.length);
-    return new DatagramIncommingMessage(datagramPacket);
+    return new DatagramMessage(datagramPacket);
   }
   
 }
