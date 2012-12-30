@@ -16,6 +16,7 @@ import javax.resource.spi.ResourceAdapterInternalException;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.resource.spi.work.WorkManager;
 import javax.transaction.xa.XAResource;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Connector
@@ -25,17 +26,20 @@ public class UdpAdapter implements ResourceAdapter {
   
   @Size(min = 1, max = 0xFFFF)
   @ConfigProperty
+  @NotNull
   private int port;
   
   @Size(min = 0, max = 65507)
   @ConfigProperty(defaultValue = "65507",
     description = "Maximum length of datagramm bodies. Setting this to the correct value can help reducing memory usage a great bit.")
   // TODO IPv6 Jumbograms?
+  @NotNull
   private int dataLength;
   
   @Size(min = 1, max = 0xFFFF)
   @ConfigProperty(defaultValue = "64",
-  description = "Maximum size of the datagram pool.")
+    description = "Maximum size of the datagram pool.")
+  @NotNull
   private int datagramPoolSize;
 
   private volatile WorkManager workManager;
@@ -93,27 +97,27 @@ public class UdpAdapter implements ResourceAdapter {
     LOG.fine("endpointDeactivation");
   }
   
-  public int getPort() {
+  public Integer getPort() {
     return this.port;
   }
 
-  public void setPort(int port) {
+  public void setPort(Integer port) {
     this.port = port;
   }
 
-  public int getDataLength() {
+  public Integer getDataLength() {
     return this.dataLength;
   }
 
-  public void setDataLength(int dataLength) {
+  public void setDataLength(Integer dataLength) {
     this.dataLength = dataLength;
   }
 
-  public int getDatagramPoolSize() {
+  public Integer getDatagramPoolSize() {
     return datagramPoolSize;
   }
 
-  public void setDatagramPoolSize(int datagramPoolSize) {
+  public void setDatagramPoolSize(Integer datagramPoolSize) {
     this.datagramPoolSize = datagramPoolSize;
   }
 

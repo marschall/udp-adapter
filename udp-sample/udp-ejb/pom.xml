@@ -8,8 +8,7 @@
   </parent>
   <artifactId>udp-ejb</artifactId>
   <packaging>ejb</packaging>
-  <name>UDP JMS Adapter Archive</name>
-  <description>A UDP JMS resource adapter archive.</description>
+  <name>UDP JMS Adapter Sample EJB</name>
   
   <dependencies>
     <dependency>

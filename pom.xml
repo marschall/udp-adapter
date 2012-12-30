@@ -160,6 +160,11 @@
           <version>1.0.1</version>
         </plugin>
         <plugin>
+          <groupId>org.jboss.ironjacamar</groupId>
+          <artifactId>ironjacamar-validator-maven</artifactId>
+          <version>1.0.0.Final</version>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
           <version>2.2.1</version>

@@ -8,8 +8,7 @@
   </parent>
   <artifactId>udp-ear</artifactId>
   <packaging>ear</packaging>
-  <name>UDP JMS Adapter Archive</name>
-  <description>A UDP JMS resource adapter archive.</description>
+  <name>UDP JMS Adapter Sample EAR</name>
   
   <dependencies>
     <dependency>

@@ -8,8 +8,8 @@
   </parent>
   <artifactId>udp-sample</artifactId>
   <packaging>pom</packaging>
-  <name>UDP JMS Adapter Archive</name>
-  <description>A UDP JMS resource adapter archive.</description>
+  <name>UDP JMS Adapter Examples</name>
+  <description>Examples for the UDP JMS resource adapter.</description>
 
   <modules>
     <module>udp-ejb</module>
