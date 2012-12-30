@@ -7,13 +7,13 @@ import java.lang.reflect.Method;
 import javax.jms.JMSException;
 import javax.jms.Message;
 
-final class InvalidatingMessage implements InvocationHandler {
+final class MessageInvalidator implements InvocationHandler {
   
   private volatile boolean valid;
   
   private final Message delegate;
   
-  InvalidatingMessage(Message delegate) {
+  MessageInvalidator(Message delegate) {
     this.delegate = delegate;
     this.valid = true;
   }

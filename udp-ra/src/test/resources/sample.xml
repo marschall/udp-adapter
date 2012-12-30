@@ -1,0 +1,18 @@
+<subsystem xmlns="urn:jboss:domain:resource-adapters:1.0">
+  <resource-adapters>
+    <resource-adapter>
+        <archive>
+            udp-rar.rar
+        </archive>
+        <config-property name="port">
+            1234
+        </config-property>
+        <config-property name="dataLength">
+            128
+        </config-property>
+        <config-property name="datagramPoolSize">
+            128
+        </config-property>
+    </resource-adapter>
+  </resource-adapters>
+</subsystem>

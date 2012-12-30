@@ -9,7 +9,11 @@ import javax.jms.MessageNotWriteableException;
 
 final class IncommingMessageWrapper implements Message {
   
-  private Message delegate;
+  private final Message delegate;
+
+  IncommingMessageWrapper(Message delegate) {
+    this.delegate = delegate;
+  }
 
   public String getJMSMessageID() throws JMSException {
     return delegate.getJMSMessageID();

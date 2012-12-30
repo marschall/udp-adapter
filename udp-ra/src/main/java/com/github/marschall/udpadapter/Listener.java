@@ -2,6 +2,7 @@ package com.github.marschall.udpadapter;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -26,7 +27,7 @@ final class Listener implements Work {
   
   private static final Method ON_MESSAGE_METHOD;
 
-  private final UdpActivationSpec spec;
+  private final UdpConfiguration configuration;
 
   private final MessagePool pool;
 
@@ -42,12 +43,12 @@ final class Listener implements Work {
     }
   }
   
-  Listener(WorkManager workManager, MessageEndpointFactory endpointFactory, UdpActivationSpec spec) throws SocketException {
+  Listener(WorkManager workManager, MessageEndpointFactory endpointFactory, UdpConfiguration configuration) throws SocketException {
     this.workManager = workManager;
     this.endpointFactory = endpointFactory;
-    this.spec = spec;
-    this.pool = new MessagePool(spec);
-    this.socket = new DatagramSocket(this.spec.getPort());
+    this.configuration = configuration;
+    this.pool = new MessagePool(configuration);
+    this.socket = new DatagramSocket(this.configuration.port);
   }
   
   void configureSocket() throws SocketException {
@@ -99,6 +100,18 @@ final class Listener implements Work {
     }
     try {
       endpoint.beforeDelivery(ON_MESSAGE_METHOD);
+      if (endpoint instanceof MessageListener) {
+        MessageListener listener = (MessageListener) endpoint;
+        // TODO cache
+        IncommingMessageWrapper wrapper = new IncommingMessageWrapper(message);
+        MessageInvalidator invalidator = new MessageInvalidator(wrapper);
+        Message proxy = (Message) Proxy.newProxyInstance(Listener.class.getClassLoader(), new Class<?>[]{Message.class}, invalidator);
+        try {
+          listener.onMessage(proxy);
+        } finally {
+          invalidator.invalidate();
+        }
+      }
       endpoint.afterDelivery();
     } catch (ResourceException | NoSuchMethodException | RuntimeException e) {
       UdpAdapter.LOG.log(Level.SEVERE, "message deliver failed", e);
@@ -111,7 +124,7 @@ final class Listener implements Work {
   @Override
   public void release() {
     // TODO remove from adapter when called by container?
-    // covered by spec?
+    // covered by configuration?
     this.cancel = true;
     this.socket.close();
     this.pool.clear();

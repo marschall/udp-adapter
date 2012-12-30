@@ -1,2 +1,4 @@
+https://community.jboss.org/wiki/JBoss6EAPOr7xxToApacheActiveMQ56Or7
+http://blog.coffeebeans.at/?p=230
 https://community.jboss.org/thread/198546
 http://www.mastertheboss.com/ejb-3/developing-mdb-with-jboss-as-7

@@ -6,14 +6,14 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 final class MessagePool {
   
-  private UdpActivationSpec spec;
+  private UdpConfiguration configuration;
   
   private final Queue<DatagramMessage> pool;
 
-  MessagePool(UdpActivationSpec spec) {
-    this.spec = spec;
+  MessagePool(UdpConfiguration spec) {
+    this.configuration = spec;
     // automatically enforces maximum pool size
-    this.pool = new ArrayBlockingQueue<>(spec.getDatagramPoolSize());
+    this.pool = new ArrayBlockingQueue<>(spec.datagramPoolSize);
   }
 
   
@@ -36,7 +36,7 @@ final class MessagePool {
   }
 
   private DatagramMessage newMessage() {
-    byte[] data = new byte[this.spec.getDataLength()];
+    byte[] data = new byte[this.configuration.dataLength];
     DatagramPacket datagramPacket = new DatagramPacket(data, data.length);
     return new DatagramMessage(datagramPacket);
   }
