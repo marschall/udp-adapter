@@ -24,7 +24,7 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage {
   DatagramMessage(DatagramPacket packet) {
     this.packet = packet;
     this.position = 0;
-    this.replyTo = new ReplyTo();
+    this.replyTo = new DatagramDestination(this);
     this.destination = new Self();
   }
   
@@ -279,10 +279,6 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage {
   @Override
   public void clearBody() throws JMSException {
     // TODO Auto-generated method stub
-  }
-
-  class ReplyTo implements Destination {
-
   }
 
   class Self implements Destination {

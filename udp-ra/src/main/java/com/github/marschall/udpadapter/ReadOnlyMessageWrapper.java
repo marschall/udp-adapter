@@ -8,11 +8,11 @@ import javax.jms.JMSException;
 import javax.jms.MessageNotWriteableException;
 import javax.jms.StreamMessage;
 
-final class IncommingMessageWrapper implements BytesMessage, StreamMessage {
+final class ReadOnlyMessageWrapper implements BytesMessage, StreamMessage {
   
   private final DatagramMessage delegate;
 
-  IncommingMessageWrapper(DatagramMessage delegate) {
+  ReadOnlyMessageWrapper(DatagramMessage delegate) {
     this.delegate = delegate;
   }
 

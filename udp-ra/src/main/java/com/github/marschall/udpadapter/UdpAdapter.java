@@ -5,7 +5,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
 
-import javax.resource.NotSupportedException;
 import javax.resource.ResourceException;
 import javax.resource.spi.ActivationSpec;
 import javax.resource.spi.BootstrapContext;
@@ -22,7 +21,7 @@ import javax.validation.constraints.Size;
 @Connector
 public class UdpAdapter implements ResourceAdapter {
   
-  static final Logger LOG = Logger.getLogger(UdpAdapter.class.getName());
+  static final Logger LOG = Logger.getLogger(UdpAdapter.class.getPackage().getName());
   
   @Size(min = 1, max = 0xFFFF)
   @ConfigProperty

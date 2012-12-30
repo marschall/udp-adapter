@@ -105,7 +105,7 @@ final class Listener implements Work {
       if (endpoint instanceof MessageListener) {
         MessageListener listener = (MessageListener) endpoint;
         // TODO cache
-        IncommingMessageWrapper wrapper = new IncommingMessageWrapper(message);
+        ReadOnlyMessageWrapper wrapper = new ReadOnlyMessageWrapper(message);
         MessageInvalidator invalidator = new MessageInvalidator(wrapper);
         Message proxy = (Message) Proxy.newProxyInstance(Listener.class.getClassLoader(),
             new Class<?>[]{BytesMessage.class, StreamMessage.class}, invalidator);
