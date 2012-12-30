@@ -12,6 +12,7 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageEOFException;
+import javax.jms.MessageFormatException;
 import javax.jms.StreamMessage;
 
 public class DatagramMessage implements Message, BytesMessage, StreamMessage {
@@ -291,19 +292,17 @@ public class DatagramMessage implements Message, BytesMessage, StreamMessage {
 
   @Override
   public String readString() throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
+    return this.readUTF();
   }
 
   @Override
   public Object readObject() throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
+    throw new MessageFormatException("unsupported");
   }
 
   @Override
   public void writeString(String value) throws JMSException {
-    // TODO Auto-generated method stub
+    this.writeUTF(value);
   }
   
   @Override
@@ -341,13 +340,11 @@ public class DatagramMessage implements Message, BytesMessage, StreamMessage {
 
   @Override
   public int readUnsignedByte() throws JMSException {
-    // TODO really?
     return this.readByte() & 0xff;
   }
 
   @Override
   public short readShort() throws JMSException {
-    // TODO really?
     return (short) ((this.readUnsignedByte() << 8) | this.readUnsignedByte());
   }
 
@@ -509,8 +506,50 @@ public class DatagramMessage implements Message, BytesMessage, StreamMessage {
 
   @Override
   public void writeObject(Object value) throws JMSException {
-    // TODO Auto-generated method stub
-    
+    if (value == null) {
+      throw new NullPointerException("value is null");
+    }
+    if (value instanceof String) {
+      this.writeUTF((String) value);
+      return;
+    }
+    if (value instanceof Long) {
+      this.writeLong((Long) value);
+      return;
+    }
+    if (value instanceof Integer) {
+      this.writeInt((Integer) value);
+      return;
+    }
+    if (value instanceof Short) {
+      this.writeShort((Short) value);
+      return;
+    }
+    if (value instanceof Character) {
+      this.writeChar((Character) value);
+      return;
+    }
+    if (value instanceof Byte) {
+      this.writeByte((Byte) value);
+      return;
+    }
+    if (value instanceof Double) {
+      this.writeDouble((Double) value);
+      return;
+    }
+    if (value instanceof Float) {
+      this.writeFloat((Float) value);
+      return;
+    }
+    if (value instanceof Boolean) {
+      this.writeBoolean((Boolean) value);
+      return;
+    }
+    if (value instanceof byte[]) {
+      this.writeBytes((byte[]) value);
+      return;
+    }
+    throw new MessageFormatException("unsupported type: " + value.getClass());
   }
 
   @Override
