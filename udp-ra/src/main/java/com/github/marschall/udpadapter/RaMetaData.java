@@ -2,7 +2,7 @@ package com.github.marschall.udpadapter;
 
 import javax.resource.cci.ResourceAdapterMetaData;
 
-public class RaMetaData implements ResourceAdapterMetaData {
+final class RaMetaData implements ResourceAdapterMetaData {
 
   @Override
   public String getAdapterVersion() {

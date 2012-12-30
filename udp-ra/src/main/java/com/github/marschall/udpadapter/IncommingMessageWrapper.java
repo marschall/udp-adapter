@@ -5,7 +5,6 @@ import java.util.Enumeration;
 import javax.jms.BytesMessage;
 import javax.jms.Destination;
 import javax.jms.JMSException;
-import javax.jms.Message;
 import javax.jms.MessageNotWriteableException;
 import javax.jms.StreamMessage;
 
@@ -206,7 +205,7 @@ final class IncommingMessageWrapper implements BytesMessage, StreamMessage {
   }
 
   public void writeString(String value) throws JMSException {
-    delegate.writeString(value);
+    throw new MessageNotWriteableException("writeString");
   }
 
   public long getBodyLength() throws JMSException {
@@ -266,48 +265,47 @@ final class IncommingMessageWrapper implements BytesMessage, StreamMessage {
   }
 
   public void writeBoolean(boolean value) throws JMSException {
-    delegate.writeBoolean(value);
+    throw new MessageNotWriteableException("writeBoolean");
   }
 
   public void writeByte(byte value) throws JMSException {
-    delegate.writeByte(value);
+    throw new MessageNotWriteableException("writeByte");
   }
 
   public void writeShort(short value) throws JMSException {
-    delegate.writeShort(value);
+    throw new MessageNotWriteableException("writeShort");
   }
 
   public void writeChar(char value) throws JMSException {
-    delegate.writeChar(value);
+    throw new MessageNotWriteableException("writeChar");
   }
 
   public void writeInt(int value) throws JMSException {
-    delegate.writeInt(value);
+    throw new MessageNotWriteableException("writeInt");
   }
 
   public void writeLong(long value) throws JMSException {
-    delegate.writeLong(value);
+    throw new MessageNotWriteableException("writeLong");
   }
 
   public void writeFloat(float value) throws JMSException {
-    delegate.writeFloat(value);
+    throw new MessageNotWriteableException("writeFloat");
   }
 
   public void writeDouble(double value) throws JMSException {
-    delegate.writeDouble(value);
+    throw new MessageNotWriteableException("writeDouble");
   }
 
   public void writeUTF(String value) throws JMSException {
-    delegate.writeUTF(value);
+    throw new MessageNotWriteableException("writeUTF");
   }
 
   public void writeBytes(byte[] value) throws JMSException {
-    delegate.writeBytes(value);
+    throw new MessageNotWriteableException("writeBytes");
   }
 
-  public void writeBytes(byte[] value, int offset, int length)
-      throws JMSException {
-    delegate.writeBytes(value, offset, length);
+  public void writeBytes(byte[] value, int offset, int length) throws JMSException {
+    throw new MessageNotWriteableException("writeBytes");
   }
 
   public void writeObject(Object value) throws JMSException {

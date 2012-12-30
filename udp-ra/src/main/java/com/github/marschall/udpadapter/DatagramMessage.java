@@ -14,7 +14,7 @@ import javax.jms.MessageEOFException;
 import javax.jms.MessageFormatException;
 import javax.jms.StreamMessage;
 
-public class DatagramMessage implements Message, BytesMessage, StreamMessage {
+final class DatagramMessage implements Message, BytesMessage, StreamMessage {
 
   private DatagramPacket packet;
   private Destination replyTo;
