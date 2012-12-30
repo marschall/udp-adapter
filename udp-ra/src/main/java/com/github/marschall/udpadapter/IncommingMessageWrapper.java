@@ -2,16 +2,18 @@ package com.github.marschall.udpadapter;
 
 import java.util.Enumeration;
 
+import javax.jms.BytesMessage;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageNotWriteableException;
+import javax.jms.StreamMessage;
 
-final class IncommingMessageWrapper implements Message {
+final class IncommingMessageWrapper implements BytesMessage, StreamMessage {
   
-  private final Message delegate;
+  private final DatagramMessage delegate;
 
-  IncommingMessageWrapper(Message delegate) {
+  IncommingMessageWrapper(DatagramMessage delegate) {
     this.delegate = delegate;
   }
 
@@ -194,9 +196,126 @@ final class IncommingMessageWrapper implements Message {
   public void clearBody() throws JMSException {
     throw new MessageNotWriteableException("clearBody");
   }
-  
-  
-  
-  
 
+  public String readString() throws JMSException {
+    return delegate.readString();
+  }
+
+  public Object readObject() throws JMSException {
+    return delegate.readObject();
+  }
+
+  public void writeString(String value) throws JMSException {
+    delegate.writeString(value);
+  }
+
+  public long getBodyLength() throws JMSException {
+    return delegate.getBodyLength();
+  }
+
+  public boolean readBoolean() throws JMSException {
+    return delegate.readBoolean();
+  }
+
+  public byte readByte() throws JMSException {
+    return delegate.readByte();
+  }
+
+  public int readUnsignedByte() throws JMSException {
+    return delegate.readUnsignedByte();
+  }
+
+  public short readShort() throws JMSException {
+    return delegate.readShort();
+  }
+
+  public int readUnsignedShort() throws JMSException {
+    return delegate.readUnsignedShort();
+  }
+
+  public char readChar() throws JMSException {
+    return delegate.readChar();
+  }
+
+  public int readInt() throws JMSException {
+    return delegate.readInt();
+  }
+
+  public long readLong() throws JMSException {
+    return delegate.readLong();
+  }
+
+  public float readFloat() throws JMSException {
+    return delegate.readFloat();
+  }
+
+  public double readDouble() throws JMSException {
+    return delegate.readDouble();
+  }
+
+  public String readUTF() throws JMSException {
+    return delegate.readUTF();
+  }
+
+  public int readBytes(byte[] value) throws JMSException {
+    return delegate.readBytes(value);
+  }
+
+  public int readBytes(byte[] value, int length) throws JMSException {
+    return delegate.readBytes(value, length);
+  }
+
+  public void writeBoolean(boolean value) throws JMSException {
+    delegate.writeBoolean(value);
+  }
+
+  public void writeByte(byte value) throws JMSException {
+    delegate.writeByte(value);
+  }
+
+  public void writeShort(short value) throws JMSException {
+    delegate.writeShort(value);
+  }
+
+  public void writeChar(char value) throws JMSException {
+    delegate.writeChar(value);
+  }
+
+  public void writeInt(int value) throws JMSException {
+    delegate.writeInt(value);
+  }
+
+  public void writeLong(long value) throws JMSException {
+    delegate.writeLong(value);
+  }
+
+  public void writeFloat(float value) throws JMSException {
+    delegate.writeFloat(value);
+  }
+
+  public void writeDouble(double value) throws JMSException {
+    delegate.writeDouble(value);
+  }
+
+  public void writeUTF(String value) throws JMSException {
+    delegate.writeUTF(value);
+  }
+
+  public void writeBytes(byte[] value) throws JMSException {
+    delegate.writeBytes(value);
+  }
+
+  public void writeBytes(byte[] value, int offset, int length)
+      throws JMSException {
+    delegate.writeBytes(value, offset, length);
+  }
+
+  public void writeObject(Object value) throws JMSException {
+    throw new MessageNotWriteableException("writeObject");
+  }
+
+  public void reset() throws JMSException {
+    delegate.reset();
+  }
+  
 }

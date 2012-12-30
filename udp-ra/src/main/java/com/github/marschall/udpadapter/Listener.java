@@ -9,8 +9,10 @@ import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import javax.jms.BytesMessage;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import javax.jms.StreamMessage;
 import javax.resource.ResourceException;
 import javax.resource.spi.UnavailableException;
 import javax.resource.spi.endpoint.MessageEndpoint;
@@ -105,7 +107,8 @@ final class Listener implements Work {
         // TODO cache
         IncommingMessageWrapper wrapper = new IncommingMessageWrapper(message);
         MessageInvalidator invalidator = new MessageInvalidator(wrapper);
-        Message proxy = (Message) Proxy.newProxyInstance(Listener.class.getClassLoader(), new Class<?>[]{Message.class}, invalidator);
+        Message proxy = (Message) Proxy.newProxyInstance(Listener.class.getClassLoader(),
+            new Class<?>[]{BytesMessage.class, StreamMessage.class}, invalidator);
         try {
           listener.onMessage(proxy);
         } finally {

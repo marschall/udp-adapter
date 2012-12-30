@@ -1,6 +1,5 @@
 package com.github.marschall.udpadapter;
 
-import java.io.UTFDataFormatException;
 import java.net.DatagramPacket;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
