@@ -59,5 +59,17 @@ public class UdpReplyManagedConnectionFactory implements ManagedConnectionFactor
   public PrintWriter getLogWriter() throws ResourceException {
     return this.out;
   }
+  
+  // the spec wants these
+  
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    return super.equals(obj);
+  }
 
 }

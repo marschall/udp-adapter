@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.jms.JMSException;
 import javax.resource.NotSupportedException;
 import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionEventListener;
@@ -14,7 +15,7 @@ import javax.resource.spi.ManagedConnectionMetaData;
 import javax.security.auth.Subject;
 import javax.transaction.xa.XAResource;
 
-public class UdpReplyManagedConnection implements ManagedConnection {
+class UdpReplyManagedConnection implements ManagedConnection {
   
   private final List<ConnectionEventListener> listeners;
   private volatile PrintWriter out;
@@ -37,8 +38,11 @@ public class UdpReplyManagedConnection implements ManagedConnection {
 
   @Override
   public void destroy() throws ResourceException {
-    // TODO
-    // nothing so far
+    try {
+      this.connection.close();
+    } catch (JMSException e) {
+      throw new ResourceException("Could not close connection", e);
+    }
   }
 
   @Override

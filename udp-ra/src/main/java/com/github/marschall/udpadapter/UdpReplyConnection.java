@@ -10,44 +10,46 @@ import javax.jms.ServerSessionPool;
 import javax.jms.Session;
 import javax.jms.Topic;
 
-public class UdpReplyConnection implements Connection {
+class UdpReplyConnection implements Connection {
+
+  private volatile String clientID;
+  
+  // TODO stand alone only?
+  private volatile ExceptionListener exceptionListener;
+  
+  UdpReplyConnection() {
+    this.exceptionListener = NullExceptionListener.INSTANCE;
+  }
 
   @Override
-  public Session createSession(boolean transacted, int acknowledgeMode)
-      throws JMSException {
+  public Session createSession(boolean transacted, int acknowledgeMode) throws JMSException {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public String getClientID() throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
+    return this.clientID;
   }
 
   @Override
   public void setClientID(String clientID) throws JMSException {
-    // TODO Auto-generated method stub
-
+    this.clientID = clientID;
   }
 
   @Override
   public ConnectionMetaData getMetaData() throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
+    return UdpConnectionMetaData.INSTANCE;
   }
 
   @Override
   public ExceptionListener getExceptionListener() throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
+    return this.exceptionListener;
   }
 
   @Override
-  public void setExceptionListener(ExceptionListener listener)
-      throws JMSException {
-    // TODO Auto-generated method stub
-
+  public void setExceptionListener(ExceptionListener listener) throws JMSException {
+    this.exceptionListener = listener;
   }
 
   @Override
@@ -70,14 +72,22 @@ public class UdpReplyConnection implements Connection {
 
   @Override
   public ConnectionConsumer createConnectionConsumer(Destination destination, String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
+    throw new JMSException("unsupported operation");
   }
 
   @Override
   public ConnectionConsumer createDurableConnectionConsumer(Topic topic, String subscriptionName, String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
+    throw new JMSException("unsupported operation");
   }
+  
+  enum NullExceptionListener implements ExceptionListener {
+    INSTANCE;
+
+    @Override
+    public void onException(JMSException exception) {
+      // null means ignore
+    }
+    
+  } 
 
 }
