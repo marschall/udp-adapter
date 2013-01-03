@@ -41,7 +41,6 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage {
   @Override
   public void setJMSMessageID(String id) throws JMSException {
     // TODO Auto-generated method stub
-
   }
 
   @Override

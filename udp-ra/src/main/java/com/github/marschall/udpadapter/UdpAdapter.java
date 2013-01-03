@@ -40,6 +40,11 @@ public class UdpAdapter implements ResourceAdapter {
     description = "Maximum size of the datagram pool.")
   @NotNull
   private int datagramPoolSize;
+  
+  @ConfigProperty(defaultValue = "false",
+      description = "Enable sending of broadcast messages.")
+  @NotNull
+  private boolean broadcast;
 
   private volatile WorkManager workManager;
   
@@ -118,6 +123,14 @@ public class UdpAdapter implements ResourceAdapter {
 
   public void setDatagramPoolSize(Integer datagramPoolSize) {
     this.datagramPoolSize = datagramPoolSize;
+  }
+  
+  public Boolean isBroadcast() {
+    return broadcast;
+  }
+
+  public void setBroadcast(Boolean broadcast) {
+    this.broadcast = broadcast;
   }
 
   @Override
