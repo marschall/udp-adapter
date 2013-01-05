@@ -1,6 +1,8 @@
 package com.github.marschall.udpadapter;
 
 import java.io.Serializable;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
 import javax.jms.BytesMessage;
 import javax.jms.Destination;
@@ -128,8 +130,7 @@ class UdpSession implements Session {
 
   @Override
   public MessageProducer createProducer(Destination destination) throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
+    return new UdpMessageProducer(destination);
   }
 
   @Override
@@ -146,17 +147,63 @@ class UdpSession implements Session {
   public MessageConsumer createConsumer(Destination destination, String messageSelector, boolean NoLocal) throws JMSException {
     throw new JMSException("unsupported");
   }
+  
+  private static SocketAddress parse(String queueName) throws JMSException {
+    if (queueName == null || queueName.isEmpty()) {
+      throw new JMSException("invalid queue name");
+    }
+    if (isIpv6(queueName)) {
+      return parseIpv6(queueName);
+    } else {
+      return parseIpv4(queueName);
+    }
+  }
+
+  static SocketAddress parseIpv4(String queueName) throws JMSException {
+    int colonIndex = queueName.indexOf(':');
+    if (colonIndex == -1 || colonIndex == 0 || colonIndex == queueName.length() -1) {
+      throw new JMSException("invalid destination name '" + queueName + "' format must be host:port");
+    }
+    String host = queueName.substring(0, colonIndex);
+    int port;
+    try {
+      port = Integer.parseInt(queueName.substring(colonIndex + 1));
+    } catch (NumberFormatException e) {
+      throw new JMSException("invalid destination name '" + queueName + "' format must be host:port");
+    }
+    return InetSocketAddress.createUnresolved(host, port);
+  }
+  
+  static SocketAddress parseIpv6(String queueName) throws JMSException {
+    int colonIndex = queueName.lastIndexOf(':'); // IPv6 contains :
+    if (colonIndex == -1 || colonIndex == queueName.length() -1) {
+      throw new JMSException("invalid destination name '" + queueName + "' format must be [host]:port");
+    }
+    if (queueName.charAt(colonIndex - 1) != ']') {
+      throw new JMSException("invalid destination name '" + queueName + "' format must be [host]:port");
+    }
+    String host = queueName.substring(1, colonIndex - 1);
+    int port;
+    try {
+      port = Integer.parseInt(queueName.substring(colonIndex + 1));
+    } catch (NumberFormatException e) {
+      throw new JMSException("invalid destination name '" + queueName + "' format must be [host]:port");
+    }
+    return InetSocketAddress.createUnresolved(host, port);
+  }
+  
+  private static boolean isIpv6(String queueName) {
+    return queueName.charAt(0) == '[';
+  }
 
   @Override
   public Queue createQueue(String queueName) throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
+    return new UdpQueue(parse(queueName), queueName);
   }
 
   @Override
   public Topic createTopic(String topicName) throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
+    return new UdpTopic(parse(topicName), topicName);
   }
 
   @Override

@@ -139,7 +139,7 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage {
 
   @Override
   public int getJMSPriority() throws JMSException {
-    return 2;
+    return DEFAULT_PRIORITY;
   }
 
   @Override
