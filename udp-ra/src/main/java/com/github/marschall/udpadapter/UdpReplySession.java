@@ -2,9 +2,8 @@ package com.github.marschall.udpadapter;
 
 
 import javax.jms.JMSException;
-import javax.jms.Session;
 
-class UdpReplySession extends UdpSession implements Session {
+class UdpReplySession extends UdpSession {
 
   UdpReplySession(boolean transacted, int acknowledgeMode) {
     super(transacted, acknowledgeMode);

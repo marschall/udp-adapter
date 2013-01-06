@@ -20,7 +20,7 @@ class UdpReplyJcaManagedConnection implements ManagedConnection {
   private final List<ConnectionEventListener> listeners;
   private volatile PrintWriter out;
   private final ConnectionRequestInfo connectionRequestInfo;
-  private volatile UdpReplyJmsConnection connection;
+  private volatile UdpJmsConnection connection;
   
   UdpReplyJcaManagedConnection(ConnectionRequestInfo connectionRequestInfo) {
     this.connectionRequestInfo = connectionRequestInfo;
@@ -54,7 +54,7 @@ class UdpReplyJcaManagedConnection implements ManagedConnection {
   @Override
   public void associateConnection(Object connection) throws ResourceException {
     if (connection instanceof UdpReplyJmsConnection) {
-      this.connection = (UdpReplyJmsConnection) connection;
+      this.connection = (UdpJmsConnection) connection;
     } else {
       throw new ResourceException("invalid connection type: " + connection);
     }

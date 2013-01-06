@@ -236,14 +236,12 @@ abstract class UdpSession implements Session {
 
   @Override
   public TemporaryQueue createTemporaryQueue() throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
+    throw new JMSException("createTemporaryQueue");
   }
 
   @Override
   public TemporaryTopic createTemporaryTopic() throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
+    throw new JMSException("createTemporaryTopic");
   }
 
   @Override
