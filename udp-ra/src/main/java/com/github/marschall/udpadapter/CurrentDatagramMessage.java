@@ -14,7 +14,9 @@ final class CurrentDatagramMessage {
   }
   
   static DatagramMessage get() {
-    return MESSAGE.get();
+    DatagramMessage message = MESSAGE.get();
+    message.reset();
+    return message;
   }
   
 }

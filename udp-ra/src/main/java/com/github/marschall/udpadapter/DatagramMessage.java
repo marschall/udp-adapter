@@ -1,5 +1,12 @@
 package com.github.marschall.udpadapter;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -12,9 +19,10 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageEOFException;
 import javax.jms.MessageFormatException;
+import javax.jms.ObjectMessage;
 import javax.jms.StreamMessage;
 
-final class DatagramMessage implements Message, BytesMessage, StreamMessage {
+final class DatagramMessage implements Message, BytesMessage, StreamMessage, ObjectMessage {
 
   private DatagramPacket packet;
   private Destination replyTo;
@@ -545,11 +553,40 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage {
     }
     throw new MessageFormatException("unsupported type: " + value.getClass());
   }
+  
+  @Override
+  public void setObject(Serializable object) throws JMSException {
+    try (OutputStream out = null;
+        ObjectOutputStream stream = new ObjectOutputStream(out)) {
+      stream.writeObject(object);
+    } catch (IOException e) {
+      JMSException jmsException = new JMSException("could not write object");
+      jmsException.setLinkedException(e);
+      throw jmsException;
+    }
+  }
+  
+  @Override
+  public Serializable getObject() throws JMSException {
+    try (InputStream in = new ByteArrayInputStream(this.packet.getData(), this.packet.getOffset(), this.packet.getLength());
+        ObjectInputStream stream = new ObjectInputStream(in)) {
+      return (Serializable) stream.readObject();
+    } catch (IOException | ClassNotFoundException e) {
+      JMSException jmsException = new JMSException("could not read object");
+      jmsException.setLinkedException(e);
+      throw jmsException;
+    }
+  }
 
   @Override
-  public void reset() throws JMSException {
+  public void reset() {
     // TODO readonly
+    // TODO correct?
     this.position = 0;
+  }
+
+  void syncPosition() {
+    this.packet.setLength(this.position);
   }
 
 }

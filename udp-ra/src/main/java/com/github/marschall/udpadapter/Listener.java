@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import javax.jms.BytesMessage;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import javax.jms.ObjectMessage;
 import javax.jms.StreamMessage;
 import javax.resource.ResourceException;
 import javax.resource.spi.UnavailableException;
@@ -23,6 +24,10 @@ import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
 
 final class Listener implements Work, MessageSender {
+
+  private static final ClassLoader THIS_CLASS_LOADER = Listener.class.getClassLoader();
+
+  private static final Class<?>[] PROXY_CLASSES = new Class<?>[]{BytesMessage.class, StreamMessage.class, ObjectMessage.class};
 
   private volatile boolean cancel = false;
   
@@ -94,6 +99,7 @@ final class Listener implements Work, MessageSender {
   
   @Override
   public void sendMessage(DatagramMessage message) throws IOException {
+    message.syncPosition();
     DatagramPacket packet = message.getPacket();
     this.socket.send(packet);
   }
@@ -116,8 +122,7 @@ final class Listener implements Work, MessageSender {
         // TODO cache
         ReadOnlyMessageWrapper wrapper = new ReadOnlyMessageWrapper(message);
         MessageInvalidator invalidator = new MessageInvalidator(wrapper);
-        Message proxy = (Message) Proxy.newProxyInstance(Listener.class.getClassLoader(),
-            new Class<?>[]{BytesMessage.class, StreamMessage.class}, invalidator);
+        Message proxy = (Message) Proxy.newProxyInstance(THIS_CLASS_LOADER, PROXY_CLASSES, invalidator);
         try {
           listener.onMessage(proxy);
         } finally {

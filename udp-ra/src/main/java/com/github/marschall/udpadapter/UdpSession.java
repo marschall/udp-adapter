@@ -23,50 +23,51 @@ import javax.jms.TextMessage;
 import javax.jms.Topic;
 import javax.jms.TopicSubscriber;
 
-class UdpSession implements Session {
+abstract class UdpSession implements Session {
 
   private volatile MessageListener messageListener;
-  private final boolean transacted;
-  private final int acknowledgeMode;
-  
+
+  final boolean transacted;
+  final int acknowledgeMode;
+
   UdpSession(boolean transacted, int acknowledgeMode) {
     this.transacted = transacted;
     this.acknowledgeMode = acknowledgeMode;
   }
-
+  
+  abstract DatagramMessage createDatagramMessage() throws JMSException;
+  
+  @Override
+  public StreamMessage createStreamMessage() throws JMSException {
+    return createDatagramMessage();
+  }
+  
   @Override
   public BytesMessage createBytesMessage() throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
+    return createDatagramMessage();
+  }
+  
+  @Override
+  public ObjectMessage createObjectMessage() throws JMSException {
+    return createDatagramMessage();
+  }
+  
+  @Override
+  public Message createMessage() throws JMSException {
+    return createDatagramMessage();
+  }
+  
+  @Override
+  public ObjectMessage createObjectMessage(Serializable object) throws JMSException {
+    DatagramMessage message = createDatagramMessage();
+    // TODO read only
+    message.setObject(object);
+    return message;
   }
 
   @Override
   public MapMessage createMapMessage() throws JMSException {
     throw new JMSException("unsupported");
-  }
-
-  @Override
-  public Message createMessage() throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public ObjectMessage createObjectMessage() throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public ObjectMessage createObjectMessage(Serializable object) throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public StreamMessage createStreamMessage() throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   @Override
@@ -148,6 +149,7 @@ class UdpSession implements Session {
     throw new JMSException("unsupported");
   }
   
+
   private static SocketAddress parse(String queueName) throws JMSException {
     if (queueName == null || queueName.isEmpty()) {
       throw new JMSException("invalid queue name");
@@ -169,11 +171,13 @@ class UdpSession implements Session {
     try {
       port = Integer.parseInt(queueName.substring(colonIndex + 1));
     } catch (NumberFormatException e) {
-      throw new JMSException("invalid destination name '" + queueName + "' format must be host:port");
+      JMSException jmsException = new JMSException("invalid destination name '" + queueName + "' format must be host:port");
+      jmsException.setLinkedException(e);
+      throw jmsException;
     }
     return InetSocketAddress.createUnresolved(host, port);
   }
-  
+
   static SocketAddress parseIpv6(String queueName) throws JMSException {
     int colonIndex = queueName.lastIndexOf(':'); // IPv6 contains :
     if (colonIndex == -1 || colonIndex == queueName.length() -1) {
@@ -187,11 +191,13 @@ class UdpSession implements Session {
     try {
       port = Integer.parseInt(queueName.substring(colonIndex + 1));
     } catch (NumberFormatException e) {
-      throw new JMSException("invalid destination name '" + queueName + "' format must be [host]:port");
+      JMSException jmsException = new JMSException("invalid destination name '" + queueName + "' format must be [host]:port");
+      jmsException.setLinkedException(e);
+      throw jmsException;
     }
     return InetSocketAddress.createUnresolved(host, port);
   }
-  
+
   private static boolean isIpv6(String queueName) {
     return queueName.charAt(0) == '[';
   }
@@ -207,12 +213,14 @@ class UdpSession implements Session {
   }
 
   @Override
-  public TopicSubscriber createDurableSubscriber(Topic topic, String name) throws JMSException {
+  public TopicSubscriber createDurableSubscriber(Topic topic, String name)
+      throws JMSException {
     throw new JMSException("unsupported");
   }
 
   @Override
-  public TopicSubscriber createDurableSubscriber(Topic topic, String name, String messageSelector, boolean noLocal) throws JMSException {
+  public TopicSubscriber createDurableSubscriber(Topic topic, String name, String messageSelector,
+      boolean noLocal) throws JMSException {
     throw new JMSException("unsupported");
   }
 

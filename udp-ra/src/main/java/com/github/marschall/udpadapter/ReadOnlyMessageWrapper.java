@@ -1,14 +1,16 @@
 package com.github.marschall.udpadapter;
 
+import java.io.Serializable;
 import java.util.Enumeration;
 
 import javax.jms.BytesMessage;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageNotWriteableException;
+import javax.jms.ObjectMessage;
 import javax.jms.StreamMessage;
 
-final class ReadOnlyMessageWrapper implements BytesMessage, StreamMessage {
+final class ReadOnlyMessageWrapper implements BytesMessage, StreamMessage, ObjectMessage {
   
   private final DatagramMessage delegate;
 
@@ -263,6 +265,11 @@ final class ReadOnlyMessageWrapper implements BytesMessage, StreamMessage {
   public int readBytes(byte[] value, int length) throws JMSException {
     return delegate.readBytes(value, length);
   }
+  
+  @Override
+  public Serializable getObject() throws JMSException {
+    return delegate.getObject();
+  }
 
   public void writeBoolean(boolean value) throws JMSException {
     throw new MessageNotWriteableException("writeBoolean");
@@ -310,6 +317,11 @@ final class ReadOnlyMessageWrapper implements BytesMessage, StreamMessage {
 
   public void writeObject(Object value) throws JMSException {
     throw new MessageNotWriteableException("writeObject");
+  }
+  
+  @Override
+  public void setObject(Serializable object) throws JMSException {
+    throw new MessageNotWriteableException("setObject");
   }
 
   public void reset() throws JMSException {

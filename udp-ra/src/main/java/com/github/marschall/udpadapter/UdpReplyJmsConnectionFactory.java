@@ -25,8 +25,9 @@ public class UdpReplyJmsConnectionFactory implements ConnectionFactory {
     try {
       connection = this.connectionManager.allocateConnection(this.connectionFactory, new EmptyConnectionRequestInfo());
     } catch (ResourceException e) {
-      // TODO cause
-      throw new JMSException("could not allocate connection");
+      JMSException jmsException = new JMSException("could not allocate connection");
+      jmsException.setLinkedException(e);
+      throw jmsException;
     }
     return (Connection) connection;
   }
