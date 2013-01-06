@@ -3,6 +3,7 @@ package com.github.marschall.udpadapter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -21,7 +22,7 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
 
-final class Listener implements Work {
+final class Listener implements Work, MessageSender {
 
   private volatile boolean cancel = false;
   
@@ -89,6 +90,12 @@ final class Listener implements Work {
       UdpAdapter.LOG.log(Level.SEVERE, "redispatching failed", e);
       this.release();
     }
+  }
+  
+  @Override
+  public void sendMessage(DatagramMessage message) throws IOException {
+    DatagramPacket packet = message.getPacket();
+    this.socket.send(packet);
   }
   
   private void dispatch(DatagramMessage message) {

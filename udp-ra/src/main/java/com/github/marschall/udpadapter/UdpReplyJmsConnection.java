@@ -10,14 +10,14 @@ import javax.jms.ServerSessionPool;
 import javax.jms.Session;
 import javax.jms.Topic;
 
-class UdpReplyConnection implements Connection {
+class UdpReplyJmsConnection implements Connection {
 
   private volatile String clientID;
   
   // TODO stand alone only?
   private volatile ExceptionListener exceptionListener;
   
-  UdpReplyConnection() {
+  UdpReplyJmsConnection() {
     this.exceptionListener = NullExceptionListener.INSTANCE;
   }
 

@@ -13,13 +13,13 @@ import javax.resource.spi.ManagedConnectionFactory;
 import javax.resource.spi.ResourceAdapterInternalException;
 import javax.security.auth.Subject;
 
-public class UdpReplyManagedConnectionFactory implements ManagedConnectionFactory {
+public class UdpReplyJcaManagedConnectionFactory implements ManagedConnectionFactory {
 
   private volatile PrintWriter out;
 
   @Override
   public Object createConnectionFactory(ConnectionManager cxManager) throws ResourceException {
-    return new UdpReplyConnectionFactory(cxManager, this);
+    return new UdpReplyJmsConnectionFactory(cxManager, this);
   }
 
   @Override
@@ -30,7 +30,7 @@ public class UdpReplyManagedConnectionFactory implements ManagedConnectionFactor
 
   @Override
   public ManagedConnection createManagedConnection(Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException {
-    return new UdpReplyManagedConnection(cxRequestInfo);
+    return new UdpReplyJcaManagedConnection(cxRequestInfo);
   }
 
   @Override
@@ -39,8 +39,8 @@ public class UdpReplyManagedConnectionFactory implements ManagedConnectionFactor
       throw new ResourceAdapterInternalException("not matching connection found");
     }
     for (Object each : connectionSet) {
-      if (each instanceof UdpReplyManagedConnection) {
-        UdpReplyManagedConnection connection = (UdpReplyManagedConnection) each;
+      if (each instanceof UdpReplyJcaManagedConnection) {
+        UdpReplyJcaManagedConnection connection = (UdpReplyJcaManagedConnection) each;
         ConnectionRequestInfo info = connection.getConnectionRequestInfo();
         if (Objects.equals(info, cxRequestInfo)) {
           return connection;

@@ -15,14 +15,14 @@ import javax.resource.spi.ManagedConnectionMetaData;
 import javax.security.auth.Subject;
 import javax.transaction.xa.XAResource;
 
-class UdpReplyManagedConnection implements ManagedConnection {
+class UdpReplyJcaManagedConnection implements ManagedConnection {
   
   private final List<ConnectionEventListener> listeners;
   private volatile PrintWriter out;
   private final ConnectionRequestInfo connectionRequestInfo;
-  private volatile UdpReplyConnection connection;
+  private volatile UdpReplyJmsConnection connection;
   
-  UdpReplyManagedConnection(ConnectionRequestInfo connectionRequestInfo) {
+  UdpReplyJcaManagedConnection(ConnectionRequestInfo connectionRequestInfo) {
     this.connectionRequestInfo = connectionRequestInfo;
     this.listeners = new CopyOnWriteArrayList<>();
   }
@@ -53,8 +53,8 @@ class UdpReplyManagedConnection implements ManagedConnection {
 
   @Override
   public void associateConnection(Object connection) throws ResourceException {
-    if (connection instanceof UdpReplyConnection) {
-      this.connection = (UdpReplyConnection) connection;
+    if (connection instanceof UdpReplyJmsConnection) {
+      this.connection = (UdpReplyJmsConnection) connection;
     } else {
       throw new ResourceException("invalid connection type: " + connection);
     }
@@ -83,8 +83,7 @@ class UdpReplyManagedConnection implements ManagedConnection {
 
   @Override
   public ManagedConnectionMetaData getMetaData() throws ResourceException {
-    // TODO
-    throw new NotSupportedException("get meta data");
+    return UdpManagedConnectionMetaData.INSTANCE;
   }
 
   @Override
@@ -96,6 +95,33 @@ class UdpReplyManagedConnection implements ManagedConnection {
   @Override
   public PrintWriter getLogWriter() throws ResourceException {
     return this.out;
+  }
+  
+  enum UdpManagedConnectionMetaData implements ManagedConnectionMetaData {
+    
+    INSTANCE;
+
+    @Override
+    public String getEISProductName() throws ResourceException {
+      return "UPD JMS";
+    }
+
+    @Override
+    public String getEISProductVersion() throws ResourceException {
+      return "0.2.0";
+    }
+
+    @Override
+    public int getMaxConnections() throws ResourceException {
+      return 0;
+    }
+
+    @Override
+    public String getUserName() throws ResourceException {
+      // TODO Auto-generated method stub
+      return null;
+    }
+    
   }
 
 }

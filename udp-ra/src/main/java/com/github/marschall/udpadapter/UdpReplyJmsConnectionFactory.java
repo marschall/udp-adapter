@@ -8,13 +8,13 @@ import javax.resource.spi.ConnectionManager;
 import javax.resource.spi.ConnectionRequestInfo;
 import javax.resource.spi.ManagedConnectionFactory;
 
-public class UdpReplyConnectionFactory implements ConnectionFactory {
+public class UdpReplyJmsConnectionFactory implements ConnectionFactory {
   
   private final ConnectionManager connectionManager;
   private final ManagedConnectionFactory connectionFactory;
   
   
-  UdpReplyConnectionFactory(ConnectionManager connectionManager, ManagedConnectionFactory connectionFactory) {
+  UdpReplyJmsConnectionFactory(ConnectionManager connectionManager, ManagedConnectionFactory connectionFactory) {
     this.connectionManager = connectionManager;
     this.connectionFactory = connectionFactory;
   }
