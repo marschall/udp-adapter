@@ -13,6 +13,7 @@ import javax.resource.spi.Connector;
 import javax.resource.spi.ResourceAdapter;
 import javax.resource.spi.ResourceAdapterInternalException;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
+import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
 import javax.transaction.xa.XAResource;
 import javax.validation.constraints.NotNull;
@@ -24,27 +25,21 @@ public class UdpAdapter implements ResourceAdapter {
   static final Logger LOG = Logger.getLogger(UdpAdapter.class.getPackage().getName());
   
   @Size(min = 1, max = 0xFFFF)
-  @ConfigProperty
-  @NotNull
-  private int port;
+  @ConfigProperty(description = "The port number on which to listen for UPD messages.")
+  private Integer listenPort;
   
   @Size(min = 0, max = 65507)
   @ConfigProperty(defaultValue = "65507",
-    description = "Maximum length of datagramm bodies. Setting this to the correct value can help reducing memory usage a great bit.")
+    description = "The maximum length of datagramm bodies. Setting this to the correct value can help reducing memory usage a great bit.")
   // TODO IPv6 Jumbograms?
   @NotNull
   private int dataLength;
   
   @Size(min = 1, max = 0xFFFF)
   @ConfigProperty(defaultValue = "64",
-    description = "Maximum size of the datagram pool.")
+    description = "The maximum size of the datagram pool.")
   @NotNull
   private int datagramPoolSize;
-  
-  @ConfigProperty(defaultValue = "false",
-      description = "Enable sending of broadcast messages.")
-  @NotNull
-  private boolean broadcast;
 
   private volatile WorkManager workManager;
   
@@ -73,7 +68,14 @@ public class UdpAdapter implements ResourceAdapter {
       throw new ResourceException("Activation spec not initialized with this ResourceAdapter instance (" + spec.getResourceAdapter() + " != " + this + ")");
     }
 
-    UdpConfiguration configuration = new UdpConfiguration(this.port, this.dataLength, this.datagramPoolSize);
+    if (this.listenPort != null) {
+      this.startListener(endpointFactory, spec);
+    }
+    LOG.fine("endpointActivation");
+  }
+
+  void startListener(MessageEndpointFactory endpointFactory, ActivationSpec spec) throws ResourceException, WorkException {
+    UdpConfiguration configuration = new UdpConfiguration(this.listenPort, this.dataLength, this.datagramPoolSize);
     Listener listener;
     try {
       listener = new Listener(this.workManager, endpointFactory, configuration);
@@ -89,7 +91,6 @@ public class UdpAdapter implements ResourceAdapter {
     
     this.workManager.scheduleWork(listener);
     this.activations.put(spec, listener);
-    LOG.fine("endpointActivation");
   }
 
   @Override
@@ -101,12 +102,12 @@ public class UdpAdapter implements ResourceAdapter {
     LOG.fine("endpointDeactivation");
   }
   
-  public Integer getPort() {
-    return this.port;
+  public Integer getListenPort() {
+    return this.listenPort;
   }
 
-  public void setPort(Integer port) {
-    this.port = port;
+  public void setListenPort(Integer port) {
+    this.listenPort = port;
   }
 
   public Integer getDataLength() {
@@ -123,14 +124,6 @@ public class UdpAdapter implements ResourceAdapter {
 
   public void setDatagramPoolSize(Integer datagramPoolSize) {
     this.datagramPoolSize = datagramPoolSize;
-  }
-  
-  public Boolean isBroadcast() {
-    return broadcast;
-  }
-
-  public void setBroadcast(Boolean broadcast) {
-    this.broadcast = broadcast;
   }
 
   @Override

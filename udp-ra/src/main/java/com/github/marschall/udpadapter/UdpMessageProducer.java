@@ -1,6 +1,7 @@
 package com.github.marschall.udpadapter;
 
 import javax.jms.Destination;
+import javax.jms.InvalidDestinationException;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
@@ -97,6 +98,9 @@ final class UdpMessageProducer implements MessageProducer {
 
   @Override
   public void send(Destination destination, Message message, int deliveryMode, int priority, long timeToLive) throws JMSException {
+    if (this.destination != null && this.destination != destination) {
+      throw new InvalidDestinationException("message producer with specific destination can only send to this destination");
+    }
     // TODO Auto-generated method stub
 
   }
