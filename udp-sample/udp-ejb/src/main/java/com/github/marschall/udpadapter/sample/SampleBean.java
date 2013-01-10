@@ -1,9 +1,13 @@
 package com.github.marschall.udpadapter.sample;
 
+import static javax.ejb.TransactionAttributeType.SUPPORTS;
+import static javax.jms.Session.AUTO_ACKNOWLEDGE;
+
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
 import javax.ejb.EJBException;
+import javax.ejb.TransactionAttribute;
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -15,11 +19,10 @@ import javax.jms.Session;
 
 import org.jboss.ejb3.annotation.ResourceAdapter;
 
-import static javax.jms.Session.AUTO_ACKNOWLEDGE;
-
 // if you don't want this you have to switch the default jboss resource adapter
 // from hornetq to udp
 @ResourceAdapter("udp-rar.rar")
+@TransactionAttribute(SUPPORTS)
 public class SampleBean implements MessageListener {
 	
 	static final Logger LOG = Logger.getLogger(SampleBean.class.getName());
