@@ -5,19 +5,22 @@ import static javax.jms.Session.AUTO_ACKNOWLEDGE;
 
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.EJBException;
 import javax.ejb.TransactionAttribute;
 import javax.jms.BytesMessage;
-import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 import org.jboss.ejb3.annotation.ResourceAdapter;
+import org.springframework.jms.JmsException;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
 
 // if you don't want this you have to switch the default jboss resource adapter
 // from hornetq to udp
@@ -30,37 +33,37 @@ public class SampleBean implements MessageListener {
 	@Resource
 	private ConnectionFactory connectionFactory;
 
+  private JmsTemplate jmsTemplate;
+	
+	@PostConstruct
+	public void ejbCreate() {
+	  this.jmsTemplate = new JmsTemplate(this.connectionFactory);
+	  // TODO really
+	  this.jmsTemplate.setSessionTransacted(false);
+	  this.jmsTemplate.setSessionAcknowledgeMode(AUTO_ACKNOWLEDGE);
+	} 
+
 	@Override
-	public void onMessage(Message message) {
+	public void onMessage(final Message message) {
 		LOG.info("onMessage");
-		//TODO Spring JMS Template
-		try {
-      Connection connection = connectionFactory.createConnection();
-      try {
-        Session session = connection.createSession(false, AUTO_ACKNOWLEDGE);
-        try {
-          MessageProducer producer = session.createProducer(message.getJMSReplyTo());
-          try {
-            BytesMessage incommingMessage = (BytesMessage) message;
-            BytesMessage replyMessage = session.createBytesMessage();
-            byte[] content = new byte[(int) incommingMessage.getBodyLength()];
-            // TODO verify
-            incommingMessage.readBytes(content);
-            replyMessage.writeBytes(content);
-            
-            producer.send(replyMessage);
-          } finally {
-            producer.close();
-          }
-        } finally {
-          session.close();
-        }
-      } finally {
-        connection.close();
-      }
+		Destination destination;
+    try {
+      destination = message.getJMSReplyTo();
     } catch (JMSException e) {
       throw new EJBException("reply failed", e);
     }
+    this.jmsTemplate.send(destination, new MessageCreator() {
+      @Override
+      public Message createMessage(Session session) throws JMSException {
+        BytesMessage incommingMessage = (BytesMessage) message;
+        BytesMessage replyMessage = session.createBytesMessage();
+        byte[] content = new byte[(int) incommingMessage.getBodyLength()];
+        // TODO verify
+        incommingMessage.readBytes(content);
+        replyMessage.writeBytes(content);
+        return replyMessage;
+      }
+    });
 	}
 
 }

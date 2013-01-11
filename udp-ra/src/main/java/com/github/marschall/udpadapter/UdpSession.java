@@ -131,6 +131,7 @@ abstract class UdpSession implements Session {
 
   @Override
   public MessageProducer createProducer(Destination destination) throws JMSException {
+    // TODO cache?
     return new UdpMessageProducer(destination);
   }
 

@@ -7,6 +7,7 @@ class UdpReplyJmsConnection extends UdpJmsConnection {
 
   @Override
   public Session createSession(boolean transacted, int acknowledgeMode) throws JMSException {
+    // TODO cache?
     return new UdpReplySession(transacted, acknowledgeMode);
   } 
 

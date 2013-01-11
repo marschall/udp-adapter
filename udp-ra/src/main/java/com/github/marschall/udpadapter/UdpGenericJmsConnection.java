@@ -13,6 +13,7 @@ final class UdpGenericJmsConnection extends UdpJmsConnection {
   
   @Override
   public Session createSession(boolean transacted, int acknowledgeMode) throws JMSException {
+    // TODO cache?
     return new UdpGenericSession(transacted, acknowledgeMode, this.pool);
   }
 
