@@ -15,5 +15,5 @@ final class UdpTopic extends UdpDestination implements Topic {
   public String getTopicName() throws JMSException {
     return this.name;
   }
-
+  
 }

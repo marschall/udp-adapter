@@ -19,6 +19,7 @@ final class SocketMessageSender implements MessageSender {
     try {
       message.syncPosition();
       DatagramPacket packet = message.getPacket();
+      // TODO setAddress
       this.socket.send(packet);
     } catch (IOException e) {
       JMSException jmsException = new JMSException("could not send message");
@@ -26,6 +27,5 @@ final class SocketMessageSender implements MessageSender {
       throw jmsException;
     }
   }
-  
 
 }

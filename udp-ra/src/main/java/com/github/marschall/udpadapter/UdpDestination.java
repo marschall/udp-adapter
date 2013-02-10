@@ -1,5 +1,6 @@
 package com.github.marschall.udpadapter;
 
+import java.net.DatagramPacket;
 import java.net.SocketAddress;
 
 import javax.jms.Destination;
@@ -21,6 +22,8 @@ abstract class UdpDestination implements Destination, MessageSender {
 
   @Override
   public void sendMessage(DatagramMessage message) throws JMSException {
+    DatagramPacket packet = message.getPacket();
+    packet.setSocketAddress(this.socketAddress);
     this.sender.sendMessage(message);
   }
   

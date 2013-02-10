@@ -21,6 +21,9 @@ import javax.validation.constraints.Size;
 @Connector
 public class UdpAdapter implements ResourceAdapter {
   
+  //TODO broadcast socket
+  //TODO multicast socket
+  
   static final Logger LOG = Logger.getLogger(UdpAdapter.class.getPackage().getName());
   
   @Size(min = 1, max = 0xFFFF)

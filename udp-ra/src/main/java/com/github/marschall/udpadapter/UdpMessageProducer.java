@@ -106,8 +106,25 @@ final class UdpMessageProducer implements MessageProducer {
     if (this.destination != null && this.destination != destination) {
       throw new InvalidDestinationException("message producer with specific destination can only send to this destination");
     }
-    // TODO Auto-generated method stub
+    if (!(message instanceof DatagramMessage)) {
+      throw new JMSException("unsupported message type: " + message);
+    }
+    
+    DatagramMessage datagramMessage = (DatagramMessage) message;
 
+    if (destination instanceof UdpDestination) {
+      UdpDestination udpDestination = (UdpDestination) destination;
+      udpDestination.sendMessage(datagramMessage);
+    }
+    if (destination instanceof DatagramDestination) {
+      DatagramDestination datagramDestination = (DatagramDestination) destination;
+      if (datagramDestination.getMessage() != message) {
+        // TODO check for wrappers 'n stuff
+        throw new JMSException("can not reply to destination of an other message");
+      }
+      this.sender.sendMessage(datagramMessage);
+    }
+    throw new JMSException("unsupported destination type: " + destination);
   }
 
 }
