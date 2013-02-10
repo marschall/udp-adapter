@@ -1,9 +1,9 @@
 package com.github.marschall.udpadapter;
 
-import java.io.IOException;
+import javax.jms.JMSException;
 
 interface MessageSender {
   
-  void sendMessage(DatagramMessage message) throws IOException;
+  void sendMessage(DatagramMessage message) throws JMSException;
 
 }

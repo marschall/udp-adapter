@@ -7,14 +7,13 @@ import javax.jms.Topic;
 
 final class UdpTopic extends UdpDestination implements Topic {
 
-  UdpTopic(SocketAddress socketAddress, String name) {
-    super(socketAddress, name);
+  UdpTopic(SocketAddress socketAddress, String name, MessageSender sender) {
+    super(socketAddress, name, sender);
   }
 
   @Override
   public String getTopicName() throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
+    return this.name;
   }
 
 }

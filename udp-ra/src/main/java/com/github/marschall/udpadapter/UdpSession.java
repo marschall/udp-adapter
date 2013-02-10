@@ -30,9 +30,12 @@ abstract class UdpSession implements Session {
   final boolean transacted;
   final int acknowledgeMode;
 
-  UdpSession(boolean transacted, int acknowledgeMode) {
+  private final MessageSender sender;
+
+  UdpSession(boolean transacted, int acknowledgeMode, MessageSender sender) {
     this.transacted = transacted;
     this.acknowledgeMode = acknowledgeMode;
+    this.sender = sender;
   }
   
   abstract DatagramMessage createDatagramMessage() throws JMSException;
@@ -132,7 +135,7 @@ abstract class UdpSession implements Session {
   @Override
   public MessageProducer createProducer(Destination destination) throws JMSException {
     // TODO cache?
-    return new UdpMessageProducer(destination);
+    return new UdpMessageProducer(destination, this.sender);
   }
 
   @Override
@@ -205,12 +208,12 @@ abstract class UdpSession implements Session {
 
   @Override
   public Queue createQueue(String queueName) throws JMSException {
-    return new UdpQueue(parse(queueName), queueName);
+    return new UdpQueue(parse(queueName), queueName, this.sender);
   }
 
   @Override
   public Topic createTopic(String topicName) throws JMSException {
-    return new UdpTopic(parse(topicName), topicName);
+    return new UdpTopic(parse(topicName), topicName, this.sender);
   }
 
   @Override

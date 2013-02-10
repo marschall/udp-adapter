@@ -14,9 +14,11 @@ final class UdpMessageProducer implements MessageProducer {
   private int defaultPriority;
   private long timeToLive;
   private final Destination destination;
+  private final MessageSender sender;
 
-  UdpMessageProducer(Destination destination) {
+  UdpMessageProducer(Destination destination, MessageSender sender) {
     this.destination = destination;
+    this.sender = sender;
   }
 
   @Override
@@ -88,7 +90,10 @@ final class UdpMessageProducer implements MessageProducer {
 
   @Override
   public void send(Message message, int deliveryMode, int priority, long timeToLive) throws JMSException {
-    // TODO Auto-generated method stub
+    if (!(message instanceof DatagramMessage)) {
+      throw new JMSException("unsupported message type: " + message);
+    }
+    this.sender.sendMessage((DatagramMessage) message);
   }
 
   @Override

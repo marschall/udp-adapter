@@ -7,8 +7,8 @@ import javax.jms.Queue;
 
 final class UdpQueue extends UdpDestination implements Queue {
 
-  UdpQueue(SocketAddress socketAddress, String name) {
-    super(socketAddress, name);
+  UdpQueue(SocketAddress socketAddress, String name, MessageSender sender) {
+    super(socketAddress, name, sender);
   }
 
   @Override

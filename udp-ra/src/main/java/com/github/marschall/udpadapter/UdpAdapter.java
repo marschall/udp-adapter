@@ -1,8 +1,7 @@
 package com.github.marschall.udpadapter;
 
+import java.net.DatagramSocket;
 import java.net.SocketException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
 
 import javax.resource.ResourceException;
@@ -37,27 +36,61 @@ public class UdpAdapter implements ResourceAdapter {
   
   @Size(min = 1, max = 0xFFFF)
   @ConfigProperty(defaultValue = "64",
-    description = "The maximum size of the datagram pool.")
-  @NotNull
-  private int datagramPoolSize;
+    description = "The maximum size of the receive datagram pool.")
+  private int receiveDatagramPoolSize;
+  
+  @Size(min = 1, max = 0xFFFF)
+  @ConfigProperty(defaultValue = "64",
+  description = "The maximum size of the send datagram pool.")
+  private Integer sendDatagramPoolSize;
+  
+  // TODO
+//  @Size(min = 1, max = 0xFFFF)
+//  @ConfigProperty(defaultValue = "1000",
+//  description = "The socket timeout when waiting for UDP datagrams.")
+//  private Integer socketTimeout;
 
   private volatile WorkManager workManager;
-  
-  private ConcurrentMap<ActivationSpec, Listener> activations;
+
+  private volatile DatagramSocket sendSocket;
+
+  private volatile MessagePool sendPool;
+
+  private volatile SocketMessageSender messageSender;
+
+  private volatile Listener listener;
   
   public UdpAdapter() {
-    this.activations = new ConcurrentHashMap<>();
+    super();
   }
 
   @Override
   public void start(BootstrapContext ctx) throws ResourceAdapterInternalException {
     workManager = ctx.getWorkManager();
+    
+    if (this.sendDatagramPoolSize != null) {
+      this.startSender();
+    }
+    
+    if (this.listenPort != null) {
+      this.startListener();
+    }
+    
     LOG.fine("started");
   }
 
   @Override
   public void stop() {
-    workManager = null;
+    // TODO close socket
+    this.workManager = null;
+    if (this.sendSocket != null) {
+      this.sendSocket.close();
+      this.sendSocket = null;
+      this.messageSender = null;
+    }
+    if (this.listener != null) {
+      this.listener.release();
+    }
     LOG.fine("stopped");
   }
 
@@ -67,39 +100,57 @@ public class UdpAdapter implements ResourceAdapter {
     if (!this.equals(spec.getResourceAdapter())) {
       throw new ResourceException("Activation spec not initialized with this ResourceAdapter instance (" + spec.getResourceAdapter() + " != " + this + ")");
     }
-
-    if (this.listenPort != null) {
-      this.startListener(endpointFactory, spec);
-    }
+    this.listener.addMessageEndpointFactory(endpointFactory);
     LOG.fine("endpointActivation");
   }
-
-  void startListener(MessageEndpointFactory endpointFactory, ActivationSpec spec) throws ResourceException, WorkException {
-    UdpConfiguration configuration = new UdpConfiguration(this.listenPort, this.dataLength, this.datagramPoolSize);
-    Listener listener;
-    try {
-      listener = new Listener(this.workManager, endpointFactory, configuration);
-    } catch (SocketException e) {
-      throw new ResourceException("could not create socket", e);
-    }
-    
-    try {
-      listener.configureSocket();
-    } catch (SocketException e) {
-      throw new ResourceException("could not configure socket", e);
-    }
-    
-    this.workManager.scheduleWork(listener);
-    this.activations.put(spec, listener);
-  }
+  
 
   @Override
   public void endpointDeactivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) {
-    Listener listener = this.activations.get(spec);
-    if (listener != null) {
-      listener.release();
-    }
+    this.listener.removeMessageEndpointFactory(endpointFactory);
     LOG.fine("endpointDeactivation");
+  }
+  
+
+  private void startSender() throws ResourceAdapterInternalException {
+    UdpConfiguration configuration = new UdpConfiguration(-1, dataLength, this.sendDatagramPoolSize);
+    try {
+      this.sendSocket = new DatagramSocket();
+      this.messageSender = new SocketMessageSender(this.sendSocket);
+    } catch (SocketException e) {
+      throw new ResourceAdapterInternalException("could not send socket", e);
+    }
+    this.sendPool = new MessagePool(configuration);
+  }
+  
+  MessageSender getMessageSender() {
+    return this.messageSender;
+  }
+  
+  MessageSender getReplyMessageSender() {
+    return this.listener;
+  }
+  
+  private void startListener() throws ResourceAdapterInternalException {
+    UdpConfiguration configuration = new UdpConfiguration(this.listenPort, this.dataLength, this.receiveDatagramPoolSize);
+    
+    try {
+      this.listener = new Listener(this.workManager, configuration);
+    } catch (SocketException e) {
+      throw new ResourceAdapterInternalException("could not create receive socket", e);
+    }
+
+    try {
+      this.listener.configureSocket();
+    } catch (SocketException e) {
+      throw new ResourceAdapterInternalException("could not configure socket", e);
+    }
+
+    try {
+      this.workManager.scheduleWork(this.listener);
+    } catch (WorkException e) {
+      throw new ResourceAdapterInternalException("could not start listen loop", e);
+    }
   }
   
   public Integer getListenPort() {
@@ -118,12 +169,20 @@ public class UdpAdapter implements ResourceAdapter {
     this.dataLength = dataLength;
   }
 
-  public Integer getDatagramPoolSize() {
-    return datagramPoolSize;
+  public void setReceiveDatagramPoolSize(Integer datagramPoolSize) {
+    this.receiveDatagramPoolSize = datagramPoolSize;
+  }
+  
+  public Integer getReceiveDatagramPoolSize() {
+    return this.receiveDatagramPoolSize;
   }
 
-  public void setDatagramPoolSize(Integer datagramPoolSize) {
-    this.datagramPoolSize = datagramPoolSize;
+  public void setSendDatagramPoolSize(Integer datagramPoolSize) {
+    this.sendDatagramPoolSize = datagramPoolSize;
+  }
+  
+  public Integer getSendDatagramPoolSize() {
+    return this.sendDatagramPoolSize;
   }
 
   @Override
@@ -143,5 +202,5 @@ public class UdpAdapter implements ResourceAdapter {
     // spec requires this
     return super.hashCode();
   }
-
+  
 }

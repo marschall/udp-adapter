@@ -18,7 +18,6 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 
 import org.jboss.ejb3.annotation.ResourceAdapter;
-import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 

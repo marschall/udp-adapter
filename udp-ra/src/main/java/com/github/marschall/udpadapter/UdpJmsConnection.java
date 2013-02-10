@@ -8,15 +8,16 @@ import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.ServerSessionPool;
 import javax.jms.Topic;
+import javax.resource.ResourceException;
+import javax.resource.spi.ResourceAdapter;
+import javax.resource.spi.ResourceAdapterAssociation;
 
-abstract class UdpJmsConnection implements Connection {
+public abstract class UdpJmsConnection implements Connection, ResourceAdapterAssociation {
 
   private volatile String clientID;
   private volatile ExceptionListener exceptionListener;
-
-  UdpJmsConnection() {
-    this.exceptionListener = NullExceptionListener.INSTANCE;
-  }
+  volatile MessageSender sender;
+  private volatile ResourceAdapter ra;
 
   @Override
   public String getClientID() throws JMSException {
@@ -72,6 +73,23 @@ abstract class UdpJmsConnection implements Connection {
       String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
     throw new JMSException("unsupported operation");
   }
+  
+
+  @Override
+  public void setResourceAdapter(ResourceAdapter ra) throws ResourceException {
+    if (!(ra instanceof UdpAdapter)) {
+      throw new ResourceException("unsupported resource adatper type: " + ra);
+    }
+    this.setResourceAdapter((UdpAdapter) ra);
+    this.ra = ra;
+  }
+  
+  @Override
+  public ResourceAdapter getResourceAdapter() {
+    return this.ra;
+  }
+  
+  abstract void setResourceAdapter(UdpAdapter ra);
 
   enum NullExceptionListener implements ExceptionListener {
     INSTANCE;

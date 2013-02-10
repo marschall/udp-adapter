@@ -5,8 +5,8 @@ import javax.jms.JMSException;
 
 class UdpReplySession extends UdpSession {
 
-  UdpReplySession(boolean transacted, int acknowledgeMode) {
-    super(transacted, acknowledgeMode);
+  UdpReplySession(boolean transacted, int acknowledgeMode, MessageSender sender) {
+    super(transacted, acknowledgeMode, sender);
   }
 
   @Override

@@ -7,8 +7,8 @@ final class UdpGenericSession extends UdpSession implements Session {
 
   private final MessagePool pool;
 
-  UdpGenericSession(boolean transacted, int acknowledgeMode, MessagePool pool) {
-    super(transacted, acknowledgeMode);
+  UdpGenericSession(boolean transacted, int acknowledgeMode, MessagePool pool, MessageSender sender) {
+    super(transacted, acknowledgeMode, sender);
     this.pool = pool;
   }
 

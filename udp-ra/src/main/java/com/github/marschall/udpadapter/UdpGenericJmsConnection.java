@@ -3,18 +3,19 @@ package com.github.marschall.udpadapter;
 import javax.jms.JMSException;
 import javax.jms.Session;
 
-final class UdpGenericJmsConnection extends UdpJmsConnection {
+public final class UdpGenericJmsConnection extends UdpJmsConnection {
 
-  private final MessagePool pool;
+  private volatile MessagePool pool;
 
-  UdpGenericJmsConnection(MessagePool pool) {
-    this.pool = pool;
-  }
-  
   @Override
   public Session createSession(boolean transacted, int acknowledgeMode) throws JMSException {
     // TODO cache?
-    return new UdpGenericSession(transacted, acknowledgeMode, this.pool);
+    return new UdpGenericSession(transacted, acknowledgeMode, this.pool, this.sender);
+  }
+  
+  @Override
+  void setResourceAdapter(UdpAdapter ra) {
+    this.sender = ra.getMessageSender();
   }
 
 }

@@ -8,7 +8,12 @@ class UdpReplyJmsConnection extends UdpJmsConnection {
   @Override
   public Session createSession(boolean transacted, int acknowledgeMode) throws JMSException {
     // TODO cache?
-    return new UdpReplySession(transacted, acknowledgeMode);
+    return new UdpReplySession(transacted, acknowledgeMode, this.sender);
   } 
+  
+  @Override
+  void setResourceAdapter(UdpAdapter ra) {
+    this.sender = ra.getReplyMessageSender();
+  }
 
 }

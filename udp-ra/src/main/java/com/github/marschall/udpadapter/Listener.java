@@ -7,10 +7,13 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import javax.jms.BytesMessage;
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
@@ -31,7 +34,7 @@ final class Listener implements Work, MessageSender {
 
   private volatile boolean cancel = false;
   
-  private final MessageEndpointFactory endpointFactory;
+  private final List<MessageEndpointFactory> endpointFactories;
   
   private static final Method ON_MESSAGE_METHOD;
 
@@ -51,10 +54,10 @@ final class Listener implements Work, MessageSender {
     }
   }
   
-  Listener(WorkManager workManager, MessageEndpointFactory endpointFactory, UdpConfiguration configuration) throws SocketException {
+  Listener(WorkManager workManager, UdpConfiguration configuration) throws SocketException {
     this.workManager = workManager;
-    this.endpointFactory = endpointFactory;
     this.configuration = configuration;
+    this.endpointFactories = new CopyOnWriteArrayList<>();
     this.pool = new MessagePool(configuration);
     this.socket = new DatagramSocket(this.configuration.port);
   }
@@ -62,6 +65,17 @@ final class Listener implements Work, MessageSender {
   void configureSocket() throws SocketException {
     this.socket.setSoTimeout((int) TimeUnit.SECONDS.toMillis(1L));
     // TODO bind?
+  }
+  
+  void addMessageEndpointFactory(MessageEndpointFactory endpointFactory) {
+    this.endpointFactories.add(endpointFactory);
+  }
+  
+  void removeMessageEndpointFactory(MessageEndpointFactory endpointFactory) {
+    boolean changed = this.endpointFactories.remove(endpointFactory);
+    if (!changed) {
+      UdpAdapter.LOG.warning("message endpoint factory: " + endpointFactory + " was not registered");
+    }
   }
 
   @Override
@@ -98,19 +112,31 @@ final class Listener implements Work, MessageSender {
   }
   
   @Override
-  public void sendMessage(DatagramMessage message) throws IOException {
-    message.syncPosition();
-    DatagramPacket packet = message.getPacket();
-    this.socket.send(packet);
+  public void sendMessage(DatagramMessage message) throws JMSException {
+    try {
+      message.syncPosition();
+      DatagramPacket packet = message.getPacket();
+      this.socket.send(packet);
+    } catch (IOException e) {
+      JMSException jmsException = new JMSException("could not send message");
+      jmsException.setLinkedException(jmsException);
+      throw jmsException;
+    }
   }
   
   private void dispatch(DatagramMessage message) {
+    for (MessageEndpointFactory endpointFactory : this.endpointFactories) {
+      this.dispatch(message, endpointFactory);
+    }
+  }
+  
+  private void dispatch(DatagramMessage message, MessageEndpointFactory endpointFactory) {
     // TODO JMSXDeliveryCount
     // TODO redelivery
     // dispatch in same thread to avoid context switch
     MessageEndpoint endpoint;
     try {
-      endpoint = this.endpointFactory.createEndpoint(null);
+      endpoint = endpointFactory.createEndpoint(null);
     } catch (UnavailableException e) {
       UdpAdapter.LOG.log(Level.SEVERE, "endpoint creation failed", e);
       return;
@@ -118,13 +144,18 @@ final class Listener implements Work, MessageSender {
     try {
       endpoint.beforeDelivery(ON_MESSAGE_METHOD);
       if (endpoint instanceof MessageListener) {
-        MessageListener listener = (MessageListener) endpoint;
+        final MessageListener listener = (MessageListener) endpoint;
         // TODO cache
         ReadOnlyMessageWrapper wrapper = new ReadOnlyMessageWrapper(message);
         MessageInvalidator invalidator = new MessageInvalidator(wrapper);
-        Message proxy = (Message) Proxy.newProxyInstance(THIS_CLASS_LOADER, PROXY_CLASSES, invalidator);
+        final Message proxy = (Message) Proxy.newProxyInstance(THIS_CLASS_LOADER, PROXY_CLASSES, invalidator);
         try {
-          listener.onMessage(proxy);
+          CurrentDatagramMessage.useDuring(message, new Runnable() {
+            @Override
+            public void run() {
+              listener.onMessage(proxy);
+            }
+          });
         } finally {
           invalidator.invalidate();
         }
@@ -135,7 +166,6 @@ final class Listener implements Work, MessageSender {
     } finally {
       endpoint.release();
     }
-    
   }
 
   @Override
