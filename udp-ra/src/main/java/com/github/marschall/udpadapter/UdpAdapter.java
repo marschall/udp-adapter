@@ -123,6 +123,10 @@ public class UdpAdapter implements ResourceAdapter {
     this.sendPool = new MessagePool(configuration);
   }
   
+  MessagePool getSendPool() {
+    return this.sendPool;
+  }
+  
   MessageSender getMessageSender() {
     return this.messageSender;
   }
@@ -202,5 +206,6 @@ public class UdpAdapter implements ResourceAdapter {
     // spec requires this
     return super.hashCode();
   }
+
   
 }

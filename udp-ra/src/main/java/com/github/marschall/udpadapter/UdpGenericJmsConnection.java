@@ -16,6 +16,7 @@ public final class UdpGenericJmsConnection extends UdpJmsConnection {
   @Override
   void setResourceAdapter(UdpAdapter ra) {
     this.sender = ra.getMessageSender();
+    this.pool = ra.getSendPool();
   }
 
 }
