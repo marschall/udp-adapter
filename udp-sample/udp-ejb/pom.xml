@@ -11,6 +11,7 @@
   <name>UDP JMS Adapter Sample EJB</name>
   
   <dependencies>
+    <!-- 
     <dependency>
       <groupId>org.jboss.spec.javax.jms</groupId>
       <artifactId>jboss-jms-api_1.1_spec</artifactId>
@@ -20,6 +21,16 @@
       <groupId>org.jboss.spec.javax.ejb</groupId>
       <artifactId>jboss-ejb-api_3.1_spec</artifactId>
       <scope>provided</scope>
+    </dependency>
+     -->
+    <dependency>
+      <groupId>javax.jms</groupId>
+      <artifactId>javax.jms-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.ejb</groupId> 
+      <artifactId>javax.ejb-api</artifactId> 
     </dependency>
     <dependency>
       <groupId>org.jboss.ejb3</groupId>
