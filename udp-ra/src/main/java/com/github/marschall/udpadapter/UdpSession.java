@@ -152,7 +152,36 @@ abstract class UdpSession implements Session {
   public MessageConsumer createConsumer(Destination destination, String messageSelector, boolean NoLocal) throws JMSException {
     throw new JMSException("unsupported");
   }
+
+  @Override
+  public MessageConsumer createSharedConsumer(Topic topic, String sharedSubscriptionName) throws JMSException {
+    throw new JMSException("unsupported");
+  }
   
+  @Override
+  public MessageConsumer createSharedDurableConsumer(Topic topic, String name) throws JMSException {
+    throw new JMSException("unsupported");
+  }
+  
+  @Override
+  public MessageConsumer createSharedConsumer(Topic topic, String sharedSubscriptionName, String messageSelector) throws JMSException {
+    throw new JMSException("unsupported");
+  }
+  
+  @Override
+  public MessageConsumer createSharedDurableConsumer(Topic topic, String name, String messageSelector) throws JMSException {
+    throw new JMSException("unsupported");
+  }
+  
+  @Override
+  public MessageConsumer createDurableConsumer(Topic topic, String name) throws JMSException {
+    throw new JMSException("unsupported");
+  }
+  
+  @Override
+  public MessageConsumer createDurableConsumer(Topic topic, String name, String messageSelector, boolean noLocal) throws JMSException {
+    throw new JMSException("unsupported");
+  }
 
   private static SocketAddress parse(String queueName) throws JMSException {
     if (queueName == null || queueName.isEmpty()) {

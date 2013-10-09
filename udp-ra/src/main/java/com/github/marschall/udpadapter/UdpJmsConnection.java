@@ -7,6 +7,7 @@ import javax.jms.Destination;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.ServerSessionPool;
+import javax.jms.Session;
 import javax.jms.Topic;
 import javax.resource.ResourceException;
 import javax.resource.spi.ResourceAdapter;
@@ -43,6 +44,17 @@ public abstract class UdpJmsConnection implements Connection, ResourceAdapterAss
   public void setExceptionListener(ExceptionListener listener) throws JMSException {
     this.exceptionListener = listener;
   }
+  
+  @Override
+  public Session createSession() throws JMSException {
+    return this.createSession(true, Session.AUTO_ACKNOWLEDGE);
+  }
+  
+  @Override
+  public Session createSession(int sessionMode) throws JMSException {
+    // TODO disallow Session.TRANSACTED and Session.CLIENT_ACKNOWLEDGE?
+    return this.createSession(false, Session.AUTO_ACKNOWLEDGE);
+  }
 
   @Override
   public void start() throws JMSException {
@@ -71,6 +83,16 @@ public abstract class UdpJmsConnection implements Connection, ResourceAdapterAss
   @Override
   public ConnectionConsumer createDurableConnectionConsumer(Topic topic, String subscriptionName,
       String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
+    throw new JMSException("unsupported operation");
+  }
+  
+  @Override
+  public ConnectionConsumer createSharedConnectionConsumer(Topic topic, String subscriptionName, String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
+    throw new JMSException("unsupported operation");
+  }
+  
+  @Override
+  public ConnectionConsumer createSharedDurableConnectionConsumer(Topic topic, String subscriptionName, String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
     throw new JMSException("unsupported operation");
   }
   
