@@ -25,6 +25,26 @@ final class ReadOnlyMessageWrapper implements BytesMessage, StreamMessage, Objec
   public void setJMSMessageID(String id) throws JMSException {
     throw new MessageNotWriteableException("setJMSMessageID");
   }
+  
+  @Override
+  public long getJMSDeliveryTime() throws JMSException {
+    return delegate.getJMSDeliveryTime();
+  }
+  
+  @Override
+  public void setJMSDeliveryTime(long deliveryTime) throws JMSException {
+    throw new MessageNotWriteableException("setJMSDeliveryTime");
+  }
+  
+  @Override
+  public <T> T getBody(Class<T> c) throws JMSException {
+    return delegate.getBody(c);
+  }
+  
+  @Override
+  public boolean isBodyAssignableTo(Class c) throws JMSException {
+    return delegate.isBodyAssignableTo(c);
+  }
 
   public long getJMSTimestamp() throws JMSException {
     return delegate.getJMSTimestamp();
