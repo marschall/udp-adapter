@@ -615,6 +615,16 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
   }
   
   @Override
+  public boolean isBodyAssignableTo(Class c) throws JMSException {
+    if (c == byte[].class) {
+      return true;
+    } else if (Serializable.class.isAssignableFrom(c)) {
+      return true;
+    }
+    return false;
+  }
+  
+  @Override
   public <T> T getBody(Class<T> c) throws JMSException {
     if (c == byte[].class) {
       this.reset();
