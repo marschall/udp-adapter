@@ -311,10 +311,20 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
 
   @Override
   public Object readObject() throws JMSException {
-    this.reset();
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    ObjectInputStream objectInputStream = new ObjectInputStream(null);
-    return objectInputStream.readObject();
+    InputStream inputStream;
+    try {
+      ObjectInputStream objectInputStream = new ClassLoaderObjectInputStream(inputStream, classLoader);
+      return objectInputStream.readObject();
+    } catch (ClassNotFoundException e) {
+      JMSException exception = new JMSException("could not load class");
+      exception.setLinkedException(exception);
+      throw exception;
+    } catch (IOException e) {
+      JMSException exception = new JMSException("could not read data");
+      exception.setLinkedException(exception);
+      throw exception;
+    }
   }
 
   @Override
