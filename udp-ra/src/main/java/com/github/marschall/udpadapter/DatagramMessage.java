@@ -50,6 +50,17 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
   public void setJMSMessageID(String id) throws JMSException {
     // TODO Auto-generated method stub
   }
+  
+  @Override
+  public long getJMSDeliveryTime() throws JMSException {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+  
+  @Override
+  public void setJMSDeliveryTime(long deliveryTime) throws JMSException {
+    // TODO Auto-generated method stub
+  }
 
   @Override
   public long getJMSTimestamp() throws JMSException {
@@ -300,7 +311,10 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
 
   @Override
   public Object readObject() throws JMSException {
-    throw new MessageFormatException("unsupported");
+    this.reset();
+    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    ObjectInputStream objectInputStream = new ObjectInputStream(null);
+    return objectInputStream.readObject();
   }
 
   @Override
@@ -588,6 +602,21 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
 
   void syncPosition() {
     this.packet.setLength(this.position);
+  }
+  
+  @Override
+  public <T> T getBody(Class<T> c) throws JMSException {
+    if (c == byte[].class) {
+      this.reset();
+      int length = this.packet.getLength();
+      byte[] data = new byte[length];
+      this.readBytes(data, length);
+      this.reset();
+      return c.cast(data);
+    } else if (Serializable.class.isAssignableFrom(c)) {
+      return c.cast(this.readObject());
+    }
+    return null;
   }
 
 }

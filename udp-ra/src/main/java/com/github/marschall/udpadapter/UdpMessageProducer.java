@@ -1,5 +1,6 @@
 package com.github.marschall.udpadapter;
 
+import javax.jms.CompletionListener;
 import javax.jms.Destination;
 import javax.jms.InvalidDestinationException;
 import javax.jms.JMSException;
@@ -12,9 +13,10 @@ final class UdpMessageProducer implements MessageProducer {
   private boolean disableMessageTimestamp;
   private int deliveryMode;
   private int defaultPriority;
-  private long timeToLive;
+  private long timeToLive = Message.DEFAULT_TIME_TO_LIVE;
   private final Destination destination;
   private final MessageSender sender;
+  private long deliveryDelay = Message.DEFAULT_DELIVERY_DELAY;
 
   UdpMessageProducer(Destination destination, MessageSender sender) {
     this.destination = destination;
@@ -72,6 +74,16 @@ final class UdpMessageProducer implements MessageProducer {
   public long getTimeToLive() throws JMSException {
     return this.timeToLive;
   }
+  
+  @Override
+  public void setDeliveryDelay(long deliveryDelay) throws JMSException {
+    this.deliveryDelay = deliveryDelay;
+  }
+  
+  @Override
+  public long getDeliveryDelay() throws JMSException {
+    return this.deliveryDelay;
+  }
 
   @Override
   public Destination getDestination() throws JMSException {
@@ -99,6 +111,26 @@ final class UdpMessageProducer implements MessageProducer {
   @Override
   public void send(Destination destination, Message message) throws JMSException {
     this.send(destination, message, this.getDeliveryMode(), this.getPriority(), this.getTimeToLive());
+  }
+  
+  @Override
+  public void send(Destination destination, Message message, CompletionListener completionListener) throws JMSException {
+    throw new JMSException("unsupported");
+  }
+  
+  @Override
+  public void send(Destination destination, Message message, int deliveryMode, int priority, long timeToLive, CompletionListener completionListener) throws JMSException {
+    throw new JMSException("unsupported");
+  }
+  
+  @Override
+  public void send(Message message, CompletionListener completionListener) throws JMSException {
+    throw new JMSException("unsupported");
+  }
+  
+  @Override
+  public void send(Message message, int deliveryMode, int priority, long timeToLive, CompletionListener completionListener) throws JMSException {
+    throw new JMSException("unsupported");
   }
 
   @Override
