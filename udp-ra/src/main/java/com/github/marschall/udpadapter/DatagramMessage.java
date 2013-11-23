@@ -312,9 +312,8 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
   @Override
   public Object readObject() throws JMSException {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    InputStream inputStream;
-    try {
-      ObjectInputStream objectInputStream = new ClassLoaderObjectInputStream(inputStream, classLoader);
+    try (InputStream inputStream = new DatagrammMessageInputStream();
+        ObjectInputStream objectInputStream = new ClassLoaderObjectInputStream(inputStream, classLoader)) {
       return objectInputStream.readObject();
     } catch (ClassNotFoundException e) {
       JMSException exception = new JMSException("could not load class");
@@ -637,6 +636,72 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
       return c.cast(this.readObject());
     }
     return null;
+  }
+  
+  class DatagrammMessageInputStream extends InputStream {
+    
+    // TODO closed check
+
+    @Override
+    public int read() throws IOException {
+      if (position >= packet.getLength()) {
+        return -1;
+      }
+      return packet.getData()[packet.getOffset() + position++];
+    }
+
+    @Override
+    public int read(byte[] b, int offset, int length) throws IOException {
+      if (length <= 0) {
+        throw new IndexOutOfBoundsException("invalid length (negative): " + length);
+      }
+      if (length == 0) {
+        return 0;
+      }
+      if (length > b.length - offset) {
+        throw new IndexOutOfBoundsException("invalid length: " + length + " bigger than: " + b.length);
+      }
+      int toRead = Math.min(capacity(), length);
+      if (toRead == 0) {
+        return -1;
+      }
+      System.arraycopy(packet.getData(), packet.getOffset() + position, b, offset, toRead);
+      position += toRead;
+      return toRead;
+    }
+
+    @Override
+    public long skip(long n) throws IOException {
+      if (n < 0L) {
+        return 0L;
+      }
+      int skip;
+      if (n > Integer.MAX_VALUE) {
+        skip = Integer.MAX_VALUE;
+      } else {
+        skip = (int) n;
+      }
+      int toSkip = Math.min(capacity(), skip);
+      position += toSkip;
+      return toSkip;
+    }
+
+    @Override
+    public int available() throws IOException {
+      return capacity();
+    }
+
+    @Override
+    public synchronized void reset() throws IOException {
+      DatagramMessage.this.reset();
+    }
+
+    @Override
+    public boolean markSupported() {
+      // TODO support mark
+      return false;
+    }
+    
   }
 
 }
