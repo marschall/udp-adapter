@@ -12,17 +12,17 @@ enum UdpConnectionMetaData implements ConnectionMetaData {
   
   @Override
   public String getJMSVersion() throws JMSException {
-    return "1.1";
+    return "2.0";
   }
 
   @Override
   public int getJMSMajorVersion() throws JMSException {
-    return 1;
+    return 2;
   }
 
   @Override
   public int getJMSMinorVersion() throws JMSException {
-    return 1;
+    return 0;
   }
 
   @Override
@@ -37,7 +37,7 @@ enum UdpConnectionMetaData implements ConnectionMetaData {
 
   @Override
   public int getProviderMajorVersion() throws JMSException {
-    return 1;
+    return 0;
   }
 
   @Override
