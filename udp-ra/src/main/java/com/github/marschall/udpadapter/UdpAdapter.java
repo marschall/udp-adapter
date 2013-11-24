@@ -18,7 +18,11 @@ import javax.transaction.xa.XAResource;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@Connector
+@Connector(
+    displayName = "UDP JMS Adapter",
+    description = "A resource adapter exposing UDP throug JMS",
+    version = "0.1"
+)
 public class UdpAdapter implements ResourceAdapter {
   
   //TODO broadcast socket
