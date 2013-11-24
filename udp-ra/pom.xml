@@ -9,7 +9,7 @@
   <artifactId>udp-ra</artifactId>
   <packaging>jar</packaging>
   <name>UDP JMS Adapter</name>
-  <description>A UDP JMS resource adapter.</description>
+  <description>A resource adapter exposing UDP throug JMS.</description>
 
   <dependencies>
     <dependency>
