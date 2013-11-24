@@ -26,26 +26,26 @@ import org.springframework.jms.core.MessageCreator;
 @ResourceAdapter("udp-rar.rar")
 @TransactionAttribute(SUPPORTS)
 public class SampleBean implements MessageListener {
-	
-	static final Logger LOG = Logger.getLogger(SampleBean.class.getName());
-	
-	@Resource
-	private ConnectionFactory connectionFactory;
+
+  static final Logger LOG = Logger.getLogger(SampleBean.class.getName());
+
+  @Resource
+  private ConnectionFactory connectionFactory;
 
   private JmsTemplate jmsTemplate;
-	
-	@PostConstruct
-	public void ejbCreate() {
-	  this.jmsTemplate = new JmsTemplate(this.connectionFactory);
-	  // TODO really
-	  this.jmsTemplate.setSessionTransacted(false);
-	  this.jmsTemplate.setSessionAcknowledgeMode(AUTO_ACKNOWLEDGE);
-	} 
 
-	@Override
-	public void onMessage(final Message message) {
-		LOG.info("onMessage");
-		Destination destination;
+  @PostConstruct
+  public void ejbCreate() {
+    this.jmsTemplate = new JmsTemplate(this.connectionFactory);
+    // TODO really
+    this.jmsTemplate.setSessionTransacted(false);
+    this.jmsTemplate.setSessionAcknowledgeMode(AUTO_ACKNOWLEDGE);
+  } 
+
+  @Override
+  public void onMessage(final Message message) {
+    LOG.info("onMessage");
+    Destination destination;
     try {
       destination = message.getJMSReplyTo();
     } catch (JMSException e) {
@@ -63,6 +63,6 @@ public class SampleBean implements MessageListener {
         return replyMessage;
       }
     });
-	}
+  }
 
 }
