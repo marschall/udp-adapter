@@ -3,6 +3,7 @@ package com.github.marschall.udpadapter.sample;
 import static javax.ejb.TransactionAttributeType.SUPPORTS;
 import static javax.jms.Session.AUTO_ACKNOWLEDGE;
 
+import java.lang.invoke.MethodHandles;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
@@ -27,7 +28,7 @@ import org.springframework.jms.core.MessageCreator;
 @TransactionAttribute(SUPPORTS)
 public class SampleBean implements MessageListener {
 
-  static final Logger LOG = Logger.getLogger(SampleBean.class.getName());
+  static final Logger LOG = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
 
   @Resource
   private ConnectionFactory connectionFactory;
