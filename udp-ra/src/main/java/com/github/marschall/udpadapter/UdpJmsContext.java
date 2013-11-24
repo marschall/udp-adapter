@@ -41,6 +41,16 @@ abstract class UdpJmsContext implements JMSContext, ResourceAdapterAssociation {
   }
   
   @Override
+  public boolean getAutoStart() {
+    return this.autoStart;
+  }
+  
+  @Override
+  public void setAutoStart(boolean autoStart) {
+    this.autoStart = autoStart;
+  }
+  
+  @Override
   public void setExceptionListener(ExceptionListener listener) {
     throw new JMSRuntimeException("setExceptionListener not allowed");
     // TODO IllegalStateRuntimeException
