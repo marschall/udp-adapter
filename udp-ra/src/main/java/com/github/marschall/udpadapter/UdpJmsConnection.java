@@ -16,7 +16,6 @@ import javax.resource.spi.ResourceAdapterAssociation;
 public abstract class UdpJmsConnection implements Connection, ResourceAdapterAssociation {
 
   private volatile String clientID;
-  private volatile ExceptionListener exceptionListener;
   volatile MessageSender sender;
   private volatile ResourceAdapter ra;
 
@@ -37,12 +36,12 @@ public abstract class UdpJmsConnection implements Connection, ResourceAdapterAss
 
   @Override
   public ExceptionListener getExceptionListener() throws JMSException {
-    return this.exceptionListener;
+    return null;
   }
 
   @Override
   public void setExceptionListener(ExceptionListener listener) throws JMSException {
-    this.exceptionListener = listener;
+    throw new JMSException("setExceptionListener not allowed");
   }
   
   @Override
