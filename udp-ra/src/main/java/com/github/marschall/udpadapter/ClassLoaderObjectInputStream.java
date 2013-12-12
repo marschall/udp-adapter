@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
-
-import net.sf.cglib.proxy.Proxy;
+import java.lang.reflect.Proxy;
 
 final class ClassLoaderObjectInputStream extends ObjectInputStream {
 
