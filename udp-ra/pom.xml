@@ -22,31 +22,19 @@
       <artifactId>junit-jupiter-engine</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- 
     <dependency>
-      <groupId>org.jboss.spec.javax.jms</groupId>
-      <artifactId>jboss-jms-api_1.1_spec</artifactId>
+      <groupId>jakarta.jms</groupId>
+      <artifactId>jakarta.jms-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.spec.javax.resource</groupId>
-      <artifactId>jboss-connector-api_1.6_spec</artifactId>
+      <groupId>jakarta.resource</groupId>
+      <artifactId>jakarta.resource-api</artifactId>
       <scope>provided</scope>
     </dependency>
-     -->
-      <dependency>
-        <groupId>javax.jms</groupId>
-        <artifactId>javax.jms-api</artifactId>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>javax.resource</groupId>
-        <artifactId>javax.resource-api</artifactId>
-        <scope>provided</scope>
-      </dependency>
     <dependency>
-      <groupId>javax.validation</groupId>
-      <artifactId>validation-api</artifactId>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
       <scope>provided</scope>
     </dependency>
   </dependencies>

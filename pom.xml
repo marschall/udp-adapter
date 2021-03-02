@@ -59,34 +59,18 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <!-- 
       <dependency>
-        <groupId>org.jboss.spec</groupId>
-        <artifactId>jboss-javaee-6.0</artifactId>
-        <version>3.0.1.Final</version>
+        <groupId>jakarta.platform</groupId>
+        <artifactId>jakarta.jakartaee-bom</artifactId>
+        <version>8.0.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-       -->
+      <!-- jakarta.messaging-api.version property seems to be missing in jakarta.jakartaee-bom -->
       <dependency>
-        <groupId>javax.validation</groupId>
-        <artifactId>validation-api</artifactId>
-        <version>1.1.0.Final</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.jms</groupId>
-        <artifactId>javax.jms-api</artifactId>
-        <version>2.0</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.resource</groupId>
-        <artifactId>javax.resource-api</artifactId>
-        <version>1.7</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.ejb</groupId> 
-        <artifactId>javax.ejb-api</artifactId> 
-        <version>3.2</version> 
+        <groupId>jakarta.jms</groupId>
+        <artifactId>jakarta.jms-api</artifactId>
+        <version>2.0.3</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -107,19 +91,17 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <release>${java.version}</release>
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
           <links>
-            <link>http://docs.oracle.com/javase/7/docs/api/</link>
-            <link>http://docs.oracle.com/javaee/6/api/</link>
+            <link>https://docs.oracle.com/javase/8/docs/api/</link>
+            <link>https://jakarta.ee/specifications/platform/8/apidocs/</link>
           </links>
         </configuration>
         <executions>
@@ -280,6 +262,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>8</java.version>
+    <jakarta.messaging-api.version>2.0.3</jakarta.messaging-api.version>
   </properties>
 
 </project>
