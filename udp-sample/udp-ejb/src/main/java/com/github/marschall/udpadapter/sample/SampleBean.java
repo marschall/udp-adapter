@@ -16,7 +16,6 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import javax.jms.Session;
 
 import org.jboss.ejb3.annotation.ResourceAdapter;
 import org.springframework.jms.core.JmsTemplate;
@@ -44,7 +43,7 @@ public class SampleBean implements MessageListener {
   } 
 
   @Override
-  public void onMessage(final Message message) {
+  public void onMessage(Message message) {
     LOG.info("onMessage");
     Destination destination;
     try {
@@ -52,17 +51,20 @@ public class SampleBean implements MessageListener {
     } catch (JMSException e) {
       throw new EJBException("reply failed", e);
     }
-    this.jmsTemplate.send(destination, new MessageCreator() {
-      @Override
-      public Message createMessage(Session session) throws JMSException {
-        BytesMessage incommingMessage = (BytesMessage) message;
-        BytesMessage replyMessage = session.createBytesMessage();
-        byte[] content = new byte[(int) incommingMessage.getBodyLength()];
-        // TODO verify
-        incommingMessage.readBytes(content);
-        replyMessage.writeBytes(content);
-        return replyMessage;
+    this.jmsTemplate.send(destination, (MessageCreator) session -> {
+      BytesMessage incommingMessage = (BytesMessage) message;
+      BytesMessage replyMessage = session.createBytesMessage();
+      int messageLength = Math.toIntExact(incommingMessage.getBodyLength());
+      if (messageLength < 0) {
+        throw new EJBException("negative message length: " + messageLength);
       }
+      byte[] content = new byte[messageLength];
+      int read = incommingMessage.readBytes(content);
+      if (read != messageLength) {
+        throw new EJBException("read: " + read + " bytes but expected: " + messageLength);
+      }
+      replyMessage.writeBytes(content);
+      return replyMessage;
     });
   }
 
