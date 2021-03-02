@@ -6,8 +6,8 @@ import java.lang.invoke.MethodHandles;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class MethodHandlesTest {
 
@@ -15,7 +15,7 @@ public class MethodHandlesTest {
   private boolean listenerCalled;
   private MethodHandle onMessage;
 
-  @Before
+  @BeforeEach
   public void setUp() throws ReflectiveOperationException {
     this.validatorCalled = false;
     this.listenerCalled = false;
