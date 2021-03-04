@@ -62,11 +62,6 @@ final class Listener implements Work, MessageSender {
     this.socket = new DatagramSocket(this.configuration.port);
   }
   
-  void configureSocket() throws SocketException {
-    this.socket.setSoTimeout((int) TimeUnit.SECONDS.toMillis(1L));
-    // TODO bind?
-  }
-  
   void addMessageEndpointFactory(MessageEndpointFactory endpointFactory) {
     this.endpointFactories.add(endpointFactory);
   }
@@ -76,6 +71,11 @@ final class Listener implements Work, MessageSender {
     if (!changed) {
       UdpAdapter.LOG.warning("message endpoint factory: " + endpointFactory + " was not registered");
     }
+  }
+
+  public void bind() throws SocketException {
+    this.socket.bind(null);
+    
   }
 
   @Override
@@ -176,6 +176,5 @@ final class Listener implements Work, MessageSender {
     this.socket.close();
     this.pool.clear();
   }
-
 
 }

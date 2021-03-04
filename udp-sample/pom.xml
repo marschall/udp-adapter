@@ -14,6 +14,7 @@
   <modules>
     <module>udp-ejb</module>
     <module>udp-ear</module>
+    <module>udp-sample-client</module>
   </modules>
   
   <dependencyManagement>

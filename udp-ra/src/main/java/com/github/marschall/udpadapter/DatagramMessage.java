@@ -35,7 +35,7 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
     this.replyTo = new DatagramDestination(this);
     this.destination = new Self();
   }
-  
+
   DatagramPacket getPacket() {
     return this.packet;
   }
@@ -50,13 +50,13 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
   public void setJMSMessageID(String id) throws JMSException {
     // TODO Auto-generated method stub
   }
-  
+
   @Override
   public long getJMSDeliveryTime() throws JMSException {
     // TODO Auto-generated method stub
     return 0;
   }
-  
+
   @Override
   public void setJMSDeliveryTime(long deliveryTime) throws JMSException {
     // TODO Auto-generated method stub
@@ -313,7 +313,7 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
   public Object readObject() throws JMSException {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     try (InputStream inputStream = new DatagrammMessageInputStream();
-        ObjectInputStream objectInputStream = new ClassLoaderObjectInputStream(inputStream, classLoader)) {
+         ObjectInputStream objectInputStream = new ClassLoaderObjectInputStream(inputStream, classLoader)) {
       return objectInputStream.readObject();
     } catch (ClassNotFoundException e) {
       JMSException exception = new JMSException("could not load class");
@@ -330,26 +330,26 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
   public void writeString(String value) throws JMSException {
     this.writeUTF(value);
   }
-  
+
   @Override
   public long getBodyLength() throws JMSException {
     return this.packet.getLength();
   }
-  
+
   private byte read() throws JMSException {
     if (this.position >= this.packet.getLength()) {
       throw new MessageEOFException("reached end of message");
     }
     return this.packet.getData()[this.packet.getOffset() + this.position++];
   }
-  
+
   private void write(byte value) throws JMSException {
     if (this.position >= this.packet.getLength()) {
       throw new MessageEOFException("reached end of message");
     }
     this.packet.getData()[this.packet.getOffset() + this.position++] = value;
   }
-  
+
   private int capacity() {
     return this.packet.getLength() - this.position;
   }
@@ -387,21 +387,21 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
   @Override
   public int readInt() throws JMSException {
     return (this.readUnsignedByte() << 24)
-         | (this.readUnsignedByte() << 16)
-         | (this.readUnsignedByte() << 8)
-         |  this.readUnsignedByte();
+        | (this.readUnsignedByte() << 16)
+        | (this.readUnsignedByte() << 8)
+        |  this.readUnsignedByte();
   }
 
   @Override
   public long readLong() throws JMSException {
     return (this.readUnsignedByte() << 56)
-         | (this.readUnsignedByte() << 48)
-         | (this.readUnsignedByte() << 40)
-         | (this.readUnsignedByte() << 32)
-         | (this.readUnsignedByte() << 24)
-         | (this.readUnsignedByte() << 16)
-         | (this.readUnsignedByte() <<  8)
-         |  this.readUnsignedByte();
+        | (this.readUnsignedByte() << 48)
+        | (this.readUnsignedByte() << 40)
+        | (this.readUnsignedByte() << 32)
+        | (this.readUnsignedByte() << 24)
+        | (this.readUnsignedByte() << 16)
+        | (this.readUnsignedByte() <<  8)
+        |  this.readUnsignedByte();
   }
 
   @Override
@@ -504,6 +504,7 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
 
   @Override
   public void writeUTF(String value) throws JMSException {
+    // TODO avoid copy, use NIO charset
     byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
     int dataLength = bytes.length;
     if (dataLength > Short.MAX_VALUE) {
@@ -577,7 +578,7 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
     }
     throw new MessageFormatException("unsupported type: " + value.getClass());
   }
-  
+
   @Override
   public void setObject(Serializable object) throws JMSException {
     try (OutputStream out = null;
@@ -589,7 +590,7 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
       throw jmsException;
     }
   }
-  
+
   @Override
   public Serializable getObject() throws JMSException {
     try (InputStream in = new ByteArrayInputStream(this.packet.getData(), this.packet.getOffset(), this.packet.getLength());
@@ -612,7 +613,7 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
   void syncPosition() {
     this.packet.setLength(this.position);
   }
-  
+
   @Override
   public boolean isBodyAssignableTo(Class c) throws JMSException {
     if (c == byte[].class) {
@@ -622,7 +623,7 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
     }
     return false;
   }
-  
+
   @Override
   public <T> T getBody(Class<T> c) throws JMSException {
     if (c == byte[].class) {
@@ -637,9 +638,9 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
     }
     return null;
   }
-  
+
   class DatagrammMessageInputStream extends InputStream {
-    
+
     // TODO closed check
 
     @Override
@@ -701,7 +702,7 @@ final class DatagramMessage implements Message, BytesMessage, StreamMessage, Obj
       // TODO support mark
       return false;
     }
-    
+
   }
 
 }

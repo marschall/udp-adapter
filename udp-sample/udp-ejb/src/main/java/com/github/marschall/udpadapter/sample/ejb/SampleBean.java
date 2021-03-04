@@ -1,4 +1,4 @@
-package com.github.marschall.udpadapter.sample;
+package com.github.marschall.udpadapter.sample.ejb;
 
 import static javax.ejb.TransactionAttributeType.SUPPORTS;
 import static javax.jms.Session.AUTO_ACKNOWLEDGE;
@@ -21,7 +21,7 @@ import org.jboss.ejb3.annotation.ResourceAdapter;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 
-// if you don't want this you have to switch the default jboss resource adapter
+// if you don't want this you have to switch the default wildfly resource adapter
 // from hornetq to udp
 @ResourceAdapter("udp-rar.rar")
 @TransactionAttribute(SUPPORTS)

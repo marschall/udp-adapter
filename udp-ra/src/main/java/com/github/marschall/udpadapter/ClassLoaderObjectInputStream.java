@@ -14,17 +14,15 @@ final class ClassLoaderObjectInputStream extends ObjectInputStream {
     super(in);
     this.classLoader = classLoader;
   }
-  
+
   @Override
-  protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException,
-      ClassNotFoundException {
+  protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
     String className = desc.getName();
     return this.classLoader.loadClass(className);
   }
-  
+
   @Override
-  protected Class<?> resolveProxyClass(String[] interfaceNames) throws IOException,
-      ClassNotFoundException {
+  protected Class<?> resolveProxyClass(String[] interfaceNames) throws IOException, ClassNotFoundException {
     Class<?>[] interfaceClasses = new Class[interfaceNames.length];
     for (int i = 0; i < interfaceNames.length; i++) {
       String interfaceName = interfaceNames[i];

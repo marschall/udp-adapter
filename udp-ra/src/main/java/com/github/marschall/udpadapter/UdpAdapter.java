@@ -22,40 +22,39 @@ import javax.validation.constraints.Size;
     displayName = "UDP JMS Adapter",
     description = "A resource adapter exposing UDP throug JMS",
     version = "0.1"
-)
+    )
 public class UdpAdapter implements ResourceAdapter {
-  
+
   //TODO broadcast socket
   //TODO multicast socket
-  
+
   static final Logger LOG = Logger.getLogger(UdpAdapter.class.getPackage().getName());
-  
+
   @Size(min = 1, max = 0xFFFF)
   @ConfigProperty(description = "The port number on which to listen for UPD messages.")
   private Integer listenPort;
-  
+
   @Size(min = 0, max = 65507)
   @ConfigProperty(defaultValue = "65507",
-    description = "The maximum length of datagramm bodies. Setting this to the correct value can help reducing memory usage a great bit.")
+  description = "The maximum length of datagramm bodies. Setting this to the correct value can help reducing memory usage a great bit.")
   // TODO IPv6 Jumbograms?
   @NotNull
   private int dataLength;
-  
+
   @Size(min = 1, max = 0xFFFF)
   @ConfigProperty(defaultValue = "64",
-    description = "The maximum size of the receive datagram pool.")
+  description = "The maximum size of the receive datagram pool.")
   private int receiveDatagramPoolSize;
-  
+
   @Size(min = 1, max = 0xFFFF)
   @ConfigProperty(defaultValue = "64",
   description = "The maximum size of the send datagram pool.")
   private Integer sendDatagramPoolSize;
-  
-  // TODO
-//  @Size(min = 1, max = 0xFFFF)
-//  @ConfigProperty(defaultValue = "1000",
-//  description = "The socket timeout when waiting for UDP datagrams.")
-//  private Integer socketTimeout;
+
+  @Size(min = 0, max = 0xFFFF)
+  @ConfigProperty(defaultValue = "1000",
+  description = "The socket timeout when waiting for UDP datagrams.")
+  private Integer socketTimeout;
 
   private volatile WorkManager workManager;
 
@@ -66,7 +65,7 @@ public class UdpAdapter implements ResourceAdapter {
   private volatile SocketMessageSender messageSender;
 
   private volatile Listener listener;
-  
+
   public UdpAdapter() {
     super();
   }
@@ -74,21 +73,20 @@ public class UdpAdapter implements ResourceAdapter {
   @Override
   public void start(BootstrapContext ctx) throws ResourceAdapterInternalException {
     workManager = ctx.getWorkManager();
-    
+
     if (this.sendDatagramPoolSize != null) {
       this.startSender();
     }
-    
+
     if (this.listenPort != null) {
       this.startListener();
     }
-    
+
     LOG.fine("started");
   }
 
   @Override
   public void stop() {
-    // TODO close socket
     this.workManager = null;
     if (this.sendSocket != null) {
       this.sendSocket.close();
@@ -110,41 +108,44 @@ public class UdpAdapter implements ResourceAdapter {
     this.listener.addMessageEndpointFactory(endpointFactory);
     LOG.fine("endpointActivation");
   }
-  
+
 
   @Override
   public void endpointDeactivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) {
     this.listener.removeMessageEndpointFactory(endpointFactory);
     LOG.fine("endpointDeactivation");
   }
-  
+
 
   private void startSender() throws ResourceAdapterInternalException {
-    UdpConfiguration configuration = new UdpConfiguration(-1, dataLength, this.sendDatagramPoolSize);
+    UdpConfiguration configuration = new UdpConfiguration(-1, this.dataLength, this.sendDatagramPoolSize);
     try {
       this.sendSocket = new DatagramSocket();
+      if (this.socketTimeout > 0) {
+        this.sendSocket.setSoTimeout(this.socketTimeout);
+      }
       this.messageSender = new SocketMessageSender(this.sendSocket);
     } catch (SocketException e) {
       throw new ResourceAdapterInternalException("could not send socket", e);
     }
     this.sendPool = new MessagePool(configuration);
   }
-  
+
   MessagePool getSendPool() {
     return this.sendPool;
   }
-  
+
   MessageSender getMessageSender() {
     return this.messageSender;
   }
-  
+
   MessageSender getReplyMessageSender() {
     return this.listener;
   }
-  
+
   private void startListener() throws ResourceAdapterInternalException {
     UdpConfiguration configuration = new UdpConfiguration(this.listenPort, this.dataLength, this.receiveDatagramPoolSize);
-    
+
     try {
       this.listener = new Listener(this.workManager, configuration);
     } catch (SocketException e) {
@@ -152,7 +153,7 @@ public class UdpAdapter implements ResourceAdapter {
     }
 
     try {
-      this.listener.configureSocket();
+      this.listener.bind();
     } catch (SocketException e) {
       throw new ResourceAdapterInternalException("could not configure socket", e);
     }
@@ -163,7 +164,7 @@ public class UdpAdapter implements ResourceAdapter {
       throw new ResourceAdapterInternalException("could not start listen loop", e);
     }
   }
-  
+
   public Integer getListenPort() {
     return this.listenPort;
   }
@@ -183,7 +184,7 @@ public class UdpAdapter implements ResourceAdapter {
   public void setReceiveDatagramPoolSize(Integer datagramPoolSize) {
     this.receiveDatagramPoolSize = datagramPoolSize;
   }
-  
+
   public Integer getReceiveDatagramPoolSize() {
     return this.receiveDatagramPoolSize;
   }
@@ -191,7 +192,7 @@ public class UdpAdapter implements ResourceAdapter {
   public void setSendDatagramPoolSize(Integer datagramPoolSize) {
     this.sendDatagramPoolSize = datagramPoolSize;
   }
-  
+
   public Integer getSendDatagramPoolSize() {
     return this.sendDatagramPoolSize;
   }
@@ -201,18 +202,18 @@ public class UdpAdapter implements ResourceAdapter {
     // spec says it's OK to return null if XA not supported
     return null;
   }
-  
+
   @Override
   public boolean equals(Object obj) {
     // spec requires this
     return super.equals(obj);
   }
-  
+
   @Override
   public int hashCode() {
     // spec requires this
     return super.hashCode();
   }
 
-  
+
 }
